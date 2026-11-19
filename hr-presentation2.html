@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Світові моделі управління людськими ресурсами</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3EC; --ink:#1B2232; --muted:#6B7280; --card:#FFFFFF; --line:#E8E2D6;
+  --usa:#2F6FED; --usa-l:#E8F0FF;
+  --jp:#E0474C;  --jp-l:#FDEBEC;
+  --eu:#159A86;  --eu-l:#E2F5F1;
+  --cn:#E3962A;  --cn-l:#FFF2DE;
+  --good:#16A34A; --good-l:#E7F7EC;
+  --bad:#DC2626;  --bad-l:#FDECEC;
+  --accent:#7C5CFF;
+  --h:'Unbounded',system-ui,sans-serif; --b:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#EAE5DA;font-family:var(--b);color:var(--ink)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ---------- STAGE ---------- */
+#stage{position:fixed;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;
+  background:var(--bg);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(60,50,30,.18);
+  background-image:radial-gradient(#E3DCCD 1.2px,transparent 1.2px);background-size:22px 22px}
+.progress{position:absolute;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--usa),var(--jp),var(--eu),var(--cn));transition:width .5s;z-index:20}
+
+.slide{position:absolute;inset:0;padding:40px 52px 70px;opacity:0;pointer-events:none;
+  transform:translateX(50px) scale(.985);transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1)}
+.slide.active{opacity:1;pointer-events:auto;transform:none}
+.slide.past{transform:translateX(-50px) scale(.985)}
+
+h1,h2,h3{font-family:var(--h);letter-spacing:-.01em}
+h2{font-size:34px;line-height:1.15}
+.kicker{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.lead{font-size:18px;color:#3B4355;line-height:1.5}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700;background:#fff;border:1px solid var(--line)}
+
+/* ---------- NAV ---------- */
+.nav{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:30;
+  background:linear-gradient(transparent,rgba(246,243,236,.95) 40%)}
+.nav .title{font-size:13px;font-weight:700;color:var(--muted);width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:7px}
+.dots button{width:9px;height:9px;border-radius:9px;background:#D6CFC0;transition:all .3s}
+.dots button.on{width:28px;background:var(--ink)}
+.navbtns{display:flex;gap:8px;width:300px;justify-content:flex-end}
+.navbtns button{height:36px;min-width:36px;padding:0 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-weight:800;font-size:14px;transition:transform .15s,background .2s}
+.navbtns button:hover{transform:translateY(-2px);background:#FFFDF8}
+.navbtns button.on{background:var(--ink);color:#fff}
+
+/* ---------- NOTES ---------- */
+.notes{position:absolute;left:52px;right:52px;bottom:64px;max-height:230px;overflow:auto;z-index:25;background:rgba(255,255,255,.97);
+  border:1px solid var(--line);border-radius:18px;padding:18px 22px;font-size:16px;line-height:1.55;box-shadow:0 20px 50px rgba(0,0,0,.12);
+  transform:translateY(20px);opacity:0;pointer-events:none;transition:.3s}
+.notes.show{transform:none;opacity:1;pointer-events:auto}
+.notes b{font-family:var(--h);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+.notes p+p{margin-top:8px}
+
+/* ---------- TITLE ---------- */
+.title-wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;height:100%;align-items:center}
+.title-wrap h1{font-size:44px;line-height:1.08;margin:14px 0 22px}
+.title-wrap h1 em{font-style:normal;background:linear-gradient(120deg,var(--usa),var(--jp) 40%,var(--eu) 70%,var(--cn));-webkit-background-clip:text;background-clip:text;color:transparent}
+.speaker{margin-top:28px;font-size:16px;color:var(--muted)}
+.speaker span{color:var(--ink);font-weight:700;border-bottom:2px dashed #CFC6B4;padding:0 4px;outline:none}
+.hint-start{margin-top:34px;display:inline-flex;gap:10px;align-items:center;font-weight:700;color:var(--muted);font-size:15px}
+kbd{font-family:var(--b);font-size:12px;font-weight:800;padding:3px 8px;border-radius:7px;background:#fff;border:1px solid var(--line);box-shadow:0 2px 0 var(--line)}
+.windows{position:relative;height:460px}
+.win{position:absolute;width:210px;height:190px;border-radius:22px;background:#fff;border:1px solid var(--line);box-shadow:0 18px 40px rgba(60,50,30,.1);padding:16px;
+  animation:bob 5s ease-in-out infinite;cursor:pointer;transition:box-shadow .3s}
+.win:hover{box-shadow:0 24px 50px rgba(60,50,30,.18)}
+.win .pane{height:100px;border-radius:14px;position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;font-size:44px;padding-bottom:4px}
+.win .pane::before{content:"";position:absolute;inset:0;background-image:linear-gradient(90deg,transparent 48%,rgba(255,255,255,.7) 48% 52%,transparent 52%),linear-gradient(transparent 48%,rgba(255,255,255,.7) 48% 52%,transparent 52%)}
+.win h4{font-family:var(--h);font-size:15px;margin-top:12px}
+.win small{color:var(--muted);font-weight:600;font-size:12.5px}
+@keyframes bob{50%{transform:translateY(-10px)}}
+
+/* ---------- RELEVANCE ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:44px;height:100%;align-items:center}
+.bullets{margin-top:24px;display:grid;gap:14px}
+.bullets div{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:16.5px;line-height:1.45}
+.bullets i{font-style:normal;font-size:24px}
+.goal{margin-top:18px;padding:16px 18px;border-radius:16px;background:var(--ink);color:#fff;font-size:16.5px;line-height:1.45}
+.goal b{color:#FFD879}
+.mcards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mcard{border-radius:22px;padding:22px;background:#fff;border:1px solid var(--line);text-align:left;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.mcard:hover{transform:translateY(-4px) rotate(-.5deg);box-shadow:0 18px 36px rgba(60,50,30,.12)}
+.mcard .flag{font-size:34px}
+.mcard h4{font-family:var(--h);font-size:19px;margin:10px 0 6px}
+.mcard p{font-size:14.5px;color:#4A5263;line-height:1.4}
+.mcard .go{position:absolute;right:16px;top:18px;font-size:12px;font-weight:800;opacity:.5}
+.mcard::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:var(--c)}
+
+/* ---------- APPROACHES ---------- */
+.appr{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+.acard{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px 24px;position:relative;cursor:pointer;transition:.25s;min-height:180px}
+.acard:hover{transform:translateY(-3px)}
+.acard .tag{position:absolute;right:18px;top:18px}
+.acard h3{font-size:21px;margin-bottom:8px}
+.acard p{font-size:15.5px;line-height:1.5;color:#3B4355}
+.acard .more{margin-top:12px;padding:12px 14px;border-radius:14px;font-size:14.5px;line-height:1.45;display:none}
+.acard.open .more{display:block;animation:pop .35s}
+.acard .tap{margin-top:10px;font-size:12.5px;font-weight:800;color:var(--muted)}
+.acard.open .tap{display:none}
+.spectrum{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px 26px 26px}
+.spectrum .ends{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.spectrum .ends small{display:block;font-weight:600;color:var(--muted);font-size:12.5px}
+.track{position:relative;height:12px;border-radius:12px;margin:46px 0 8px;background:linear-gradient(90deg,#9AA7BF,#CFC6B4 50%,#8FD3C7)}
+.pin{position:absolute;top:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:#fff;border:3px solid var(--c);font-size:20px;display:grid;place-items:center;transition:transform .2s;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+.pin:hover,.pin.on{transform:translate(-50%,-50%) scale(1.18)}
+.pin .tip{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);width:230px;background:var(--ink);color:#fff;font-size:13px;line-height:1.4;padding:10px 12px;border-radius:12px;opacity:0;pointer-events:none;transition:.2s;text-align:left;font-weight:600}
+.pin.on .tip{opacity:1}
+.cond{margin-top:14px;font-size:12px;color:var(--muted);font-weight:600;text-align:right}
+
+.hs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+.hcard{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px 22px;border-top:5px solid var(--c)}
+.hhead{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.hic{font-size:30px;width:50px;height:50px;border-radius:14px;background:var(--cl);display:grid;place-items:center}
+.hhead h3{font-size:17px}.hhead small{color:var(--muted);font-weight:600;font-size:12px}
+.hcard p{font-size:14.5px;line-height:1.45;color:#3B4355}
+.hlab{margin:10px 0 4px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.cycle{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:6px;font-size:13px;font-weight:800;color:var(--muted)}
+.cycle span{background:var(--cl);color:var(--c);padding:5px 9px;border-radius:999px}
+.cycle em{font-style:normal;font-size:18px;color:var(--c)}
+.hq{margin-top:10px;padding:9px 12px;border-radius:12px;background:#F7F4EC;font-size:13.5px;font-weight:700;line-height:1.4}
+.slide .spectrum{margin-top:14px;padding:14px 24px 14px}
+.slide .spectrum .track{margin:30px 0 8px}
+.slide .spectrum .cond{margin-top:12px}
+
+/* ---------- POPUP ---------- */
+.pop-bg{position:absolute;inset:0;z-index:60;background:rgba(27,34,50,.32);backdrop-filter:blur(3px);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.pop-bg.show{opacity:1;pointer-events:auto}
+.pop{width:740px;background:#fff;border-radius:28px;padding:28px 32px 24px;box-shadow:0 30px 70px rgba(0,0,0,.25);transform:scale(.9) translateY(24px);transition:transform .35s cubic-bezier(.3,1.4,.5,1);border-top:7px solid var(--pc)}
+.pop-bg.show .pop{transform:none}
+.pop .ph{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.pop .pi{font-size:40px;width:68px;height:68px;border-radius:20px;background:var(--pcl);display:grid;place-items:center;flex-shrink:0}
+.pop h3{font-size:24px}.pop .ps{color:var(--muted);font-weight:700;font-size:14px;margin-top:2px}
+.pop p{font-size:16px;line-height:1.5;color:#2F3747;margin-top:8px}
+.pop .flow{display:flex;align-items:stretch;gap:6px;margin:16px 0 4px}
+.pop .flow div{flex:1;min-width:0;background:#F7F4EC;border-radius:12px;padding:8px 6px;text-align:center;font-size:12px;font-weight:800;line-height:1.25}
+.pop .flow i{align-self:center}
+.pop .flow div b{display:block;font-size:22px;margin-bottom:2px}
+.pop .flow i{font-style:normal;color:var(--muted);font-weight:800}
+.pop .flow .stamp{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#E0474C;color:#fff;font-size:10px;margin-top:4px;transform:rotate(-12deg)}
+.pop .pc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.pop .pc div{border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4}
+.pop .pc .p{background:var(--good-l)}.pop .pc .m{background:var(--bad-l)}
+.pop .pf{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.pop .pf small{color:var(--muted);font-weight:600;font-size:12.5px}
+.pop .pf button{padding:11px 18px;border-radius:14px;background:var(--ink);color:#fff;font-weight:800;font-size:14px}
+.info{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:800;color:var(--c);background:#fff;border:1.5px solid var(--c);border-radius:999px;padding:1px 8px;cursor:pointer;vertical-align:1px}
+
+/* ---------- SCENE ---------- */
+.scene-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:18px}
+.scene-head h2{font-size:32px}
+.scene-head h2 span{color:var(--c)}
+.kw{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end;max-width:560px}
+.kw .chip{border-color:transparent;background:var(--cl);color:var(--c)}
+.scene-body{display:grid;grid-template-columns:600px 1fr;gap:24px;height:520px}
+.left-col{display:flex;flex-direction:column;gap:14px}
+
+.office{position:relative;height:390px;border-radius:24px;overflow:hidden;background:var(--wall);border:1px solid var(--line)}
+.office .floor{position:absolute;left:0;right:0;bottom:0;height:118px;background:var(--floor)}
+.office .floor::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(0,0,0,.035) 0 2px,transparent 2px 60px)}
+.office .label{position:absolute;left:16px;top:14px;z-index:5;background:rgba(255,255,255,.92);font-size:12.5px;font-weight:800;padding:6px 11px;border-radius:999px;border:1px solid var(--line)}
+.prop{position:absolute}
+.cast{position:absolute;left:0;right:0;bottom:22px;height:170px;z-index:4}
+.char{position:absolute;bottom:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;transition:left .6s cubic-bezier(.2,.8,.2,1),opacity .4s}
+.char .head{width:96px;height:96px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:58px;border:4px solid #fff;box-shadow:0 10px 24px rgba(0,0,0,.12);transition:.25s;position:relative}
+.char .body{width:74px;height:34px;margin-top:-10px;border-radius:30px 30px 8px 8px;background:var(--suit,#3E4A63)}
+.char .tag{margin-top:6px;background:#fff;border-radius:10px;padding:4px 10px;text-align:center;font-size:12.5px;line-height:1.15;border:1px solid var(--line);white-space:nowrap}
+.char .tag small{display:block;color:var(--muted);font-weight:600;font-size:11px}
+.char.talk .head{border-color:var(--c);transform:translateY(-8px) scale(1.06);animation:talk .5s ease-in-out infinite alternate}
+.char.talk .head::after{content:"💬";position:absolute;top:-14px;right:-16px;font-size:26px;animation:pop .3s}
+.char.dim{opacity:.55}
+@keyframes talk{to{transform:translateY(-12px) scale(1.08) rotate(2deg)}}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+
+.pm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pm div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;font-size:13.5px;line-height:1.45}
+.pm b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.pm .plus b{color:var(--good)} .pm .minus b{color:var(--bad)}
+
+.chatbox{background:#fff;border:1px solid var(--line);border-radius:24px;display:flex;flex-direction:column;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.chatbox.bad{border-color:#F4B4B4;box-shadow:0 0 0 4px var(--bad-l)}
+.chatbox.good{box-shadow:0 0 0 4px var(--good-l)}
+.toggle{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line);background:#FBFAF6}
+.toggle button{flex:1;padding:10px;border-radius:12px;font-weight:800;font-size:14px;color:var(--muted);transition:.2s}
+.toggle button.on[data-mode=good]{background:var(--good-l);color:var(--good)}
+.toggle button.on[data-mode=bad]{background:var(--bad-l);color:var(--bad)}
+.chat{flex:1;overflow-y:auto;padding:16px 16px 6px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.msg{display:flex;gap:9px;align-items:flex-end;max-width:88%;animation:msgIn .35s cubic-bezier(.2,.8,.2,1)}
+.msg.r{align-self:flex-end;flex-direction:row-reverse}
+.msg .av{width:34px;height:34px;border-radius:50%;background:#F3EFE6;display:grid;place-items:center;font-size:21px;flex-shrink:0}
+.msg .bub{padding:10px 13px;border-radius:16px 16px 16px 5px;background:#F5F3EE;font-size:14.8px;line-height:1.42}
+.msg.r .bub{border-radius:16px 16px 5px 16px;background:var(--cl)}
+.msg .bub b{display:block;font-size:11.5px;color:var(--c);margin-bottom:2px;letter-spacing:.02em}
+.msg .bub i{color:var(--muted)}
+.typing .bub{display:flex;gap:4px;padding:14px}
+.typing .bub span{width:7px;height:7px;border-radius:50%;background:#B9B2A3;animation:blink 1s infinite}
+.typing .bub span:nth-child(2){animation-delay:.15s}.typing .bub span:nth-child(3){animation-delay:.3s}
+@keyframes blink{50%{opacity:.25;transform:translateY(-3px)}}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.sys{align-self:center;font-size:12.5px;font-weight:700;color:var(--muted);background:#F4F1EA;padding:6px 12px;border-radius:999px;animation:msgIn .35s}
+.insight{border-radius:16px;padding:12px 14px;font-size:14.3px;line-height:1.45;animation:msgIn .4s;border:1px solid}
+.insight.good{background:var(--good-l);border-color:#BFE6CB}
+.insight.bad{background:var(--bad-l);border-color:#F4C3C3}
+.insight strong{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.insight.good strong{color:var(--good)} .insight.bad strong{color:var(--bad)}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid var(--line)}
+.foot .hint{font-size:12px;color:var(--muted);font-weight:600}
+.foot .btns{display:flex;gap:6px}
+.foot button{padding:9px 14px;border-radius:12px;font-weight:800;font-size:13.5px;background:var(--ink);color:#fff;transition:transform .15s}
+.foot button.alt{background:var(--bad-l);color:var(--bad)}
+.foot button:hover{transform:translateY(-2px)}
+.counter{font-size:12px;font-weight:800;color:var(--muted)}
+
+/* office themes */
+.o-usa{--wall:#EAF1FB;--floor:#D7DEE9}
+.o-jp{--wall:#F7EFE3;--floor:#E3D3BB}
+.o-eu{--wall:#EAF6F1;--floor:#D6E6DC}
+.o-cn{--wall:#FFF5E6;--floor:#EBD6B6}
+.window{border:7px solid #fff;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.06);overflow:hidden}
+.sky{background:linear-gradient(#BFD8FF,#EFF6FF)}
+.sky .b{position:absolute;bottom:0;background:#9DB3D6;border-radius:2px 2px 0 0}
+.card{background:#fff;border-radius:10px;box-shadow:0 6px 14px rgba(0,0,0,.07);padding:8px 10px;font-size:11.5px;font-weight:800}
+.minibars{display:flex;align-items:flex-end;gap:6px;height:56px;margin-top:6px}
+.minibars i{flex:1;border-radius:4px 4px 0 0;background:var(--c)}
+.desk{height:16px;border-radius:6px;background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.08)}
+.desk::before,.desk::after{content:"";position:absolute;top:16px;width:8px;height:56px;background:#C9C2B3;border-radius:3px}
+.desk::before{left:12px}.desk::after{right:12px}
+.desk span{position:absolute;bottom:14px;font-size:30px}
+.shoji{background:#FFFDF7;background-image:linear-gradient(90deg,#D9C7A8 2px,transparent 2px),linear-gradient(#D9C7A8 2px,transparent 2px);background-size:30px 30px;border:7px solid #B99A6B;border-radius:6px}
+.stamps{display:flex;gap:6px;margin-top:6px}
+.stamps i{width:26px;height:26px;border-radius:50%;border:2px dashed #E6B7B7;display:grid;place-items:center;font-style:normal;font-size:10px;color:#fff}
+.stamps i.ok{background:var(--jp);border:none;transform:rotate(-12deg)}
+.vposter{background:#fff;border-radius:6px;box-shadow:0 6px 14px rgba(0,0,0,.07);writing-mode:vertical-rl;font-weight:800;padding:12px 8px;font-size:20px;color:var(--jp)}
+.green{background:linear-gradient(#CDEBDD,#F2FBF6)}
+.round{border-radius:50%;background:#fff;box-shadow:0 8px 0 rgba(0,0,0,.07)}
+.lantern{font-size:40px;animation:sway 3s ease-in-out infinite;transform-origin:top center}
+@keyframes sway{50%{transform:rotate(6deg)}}
+
+
+/* ---------- 3D OFFICE ---------- */
+.office{perspective:1250px;perspective-origin:50% 30%;cursor:grab;touch-action:none;
+  background:radial-gradient(ellipse at 50% 20%,#FFFFFF,var(--bgw) 75%)}
+.office.drag{cursor:grabbing}
+.o-usa{--bgw:#E3ECF8;--wall:#F1F6FD;--wall2:#E2EBF8;--floor:#CFD8E6;--desk:#FFFFFF;--deskS:#DCE3EE;--deskS2:#C9D2E0}
+.o-jp{--bgw:#F3E8D8;--wall:#FBF5EB;--wall2:#F1E6D4;--floor:#DCC6A4;--desk:#F6EEE1;--deskS:#D9C6A7;--deskS2:#C9B28E}
+.o-eu{--bgw:#E2F1EA;--wall:#F2FAF6;--wall2:#E1F0E8;--floor:#CFE2D6;--desk:#FFFFFF;--deskS:#D5E4DB;--deskS2:#C2D6CA}
+.o-cn{--bgw:#FBEBD3;--wall:#FFF8EC;--wall2:#F8E9D2;--floor:#E3C79C;--desk:#7A3E2B;--deskS:#5E2D1F;--deskS2:#4C2418}
+.world{position:absolute;left:50%;top:58%;width:440px;height:340px;transform-style:preserve-3d;transform-origin:50% 50%}
+.world *{transform-style:preserve-3d}
+.world .fl{position:absolute;inset:0;background-color:var(--floor);
+  background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);background-size:40px 40px;
+  box-shadow:0 0 0 6px rgba(255,255,255,.6)}
+.world .wall{position:absolute;background:var(--wall);box-shadow:inset 0 -18px 0 rgba(0,0,0,.05)}
+.world .wb{left:0;top:-170px;width:440px;height:170px;transform-origin:50% 100%;transform:rotateX(-90deg)}
+.world .wl{left:-340px;top:-170px;width:340px;height:170px;transform-origin:100% 100%;transform:rotateZ(-90deg) rotateX(-90deg);background:var(--wall2)}
+.world .wall>div{position:absolute}
+.world .bx{position:absolute}
+.world .bx>i{position:absolute;display:block}
+.world .mk{position:absolute;width:0;height:0}
+.world .stick{position:absolute;left:0;bottom:0;width:0;height:40px;transform-origin:50% 100%;transform:rotateX(-90deg)}
+.ov{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ovi{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.ovi .pe{position:absolute;left:0;top:0;transform:translate(-50%,-100%);line-height:1;white-space:nowrap}
+.ovi .lantern{display:inline-block}
+.world .shadow{position:absolute;width:70px;height:30px;margin:-15px 0 0 -35px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.22),transparent 70%)}
+.fig{display:flex;flex-direction:column;align-items:center;transition:filter .3s,opacity .3s}
+.fig .hd{width:66px;height:66px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:42px;border:3px solid #fff;box-shadow:0 6px 14px rgba(0,0,0,.15);transition:.25s}
+.fig .bd{width:56px;height:46px;margin-top:-8px;border-radius:26px 26px 10px 10px;background:var(--suit,#3E4A63);box-shadow:inset -8px 0 0 rgba(0,0,0,.12)}
+.fig .lg{display:flex;gap:6px}.fig .lg i{width:12px;height:22px;border-radius:0 0 6px 6px;background:#2B3242}
+.fig .nm{margin-top:4px;background:#fff;border-radius:9px;padding:3px 8px;text-align:center;font-size:11.5px;font-weight:800;border:1px solid var(--line)}
+.fig .nm small{display:block;color:var(--muted);font-weight:600;font-size:10px}
+.fig.talk .hd{border-color:var(--c);transform:translateY(-6px) scale(1.08);animation:talk .45s ease-in-out infinite alternate}
+.fig.dim{opacity:.6;filter:saturate(.6)}
+.say{position:absolute;bottom:100%;left:50%;margin-bottom:10px;transform:translateX(-50%) translateY(10px) scale(.5);transform-origin:50% 100%;opacity:0;
+  width:max-content;max-width:250px;background:#fff;border:2px solid var(--c);border-radius:16px;padding:9px 12px;font-size:13.5px;font-weight:600;line-height:1.38;
+  white-space:normal;text-align:left;box-shadow:0 12px 26px rgba(0,0,0,.14);transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .25s;pointer-events:none}
+.say::after{content:"";position:absolute;left:50%;bottom:-9px;width:14px;height:14px;margin-left:-7px;background:#fff;border-right:2px solid var(--c);border-bottom:2px solid var(--c);transform:rotate(45deg)}
+.say.on{opacity:1;transform:translateX(-50%) scale(1)}
+.say .dots{display:flex;gap:4px;padding:3px 2px}.say .dots span{width:7px;height:7px;border-radius:50%;background:#B9B2A3;animation:blink 1s infinite}
+.say .dots span:nth-child(2){animation-delay:.15s}.say .dots span:nth-child(3){animation-delay:.3s}
+.poster{background:#fff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.08);padding:7px 9px;font-size:11px;font-weight:800;line-height:1.3}
+.hint3d{position:absolute;right:12px;bottom:10px;z-index:5;font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.85);padding:4px 9px;border-radius:999px;pointer-events:none;transition:opacity .5s}
+.office.touched .hint3d{opacity:0}
+
+
+/* 3D figurines */
+.world .pp{position:absolute;width:0;height:0;transition:transform .7s cubic-bezier(.3,1.2,.5,1)}
+.world .cb{position:absolute}
+.world .cb>i{position:absolute;left:0;top:0;display:block;overflow:hidden}
+.world .cb>i.s{box-shadow:inset 0 0 0 200px rgba(0,0,0,.13)}
+.world .cb>i.bk{box-shadow:inset 0 0 0 200px rgba(0,0,0,.06)}
+.world .cb>i.tp{box-shadow:inset 0 0 0 200px rgba(255,255,255,.12)}
+.world .jt{position:absolute;width:0;height:0}
+.world .head{transform:translateZ(var(--z));animation:idle 3.2s ease-in-out infinite}
+.world .pp.talk .head{animation:bob .42s ease-in-out infinite alternate}
+.world .arm{transform:translateZ(var(--z)) rotateX(0deg)}
+.world .pp.talk .arm.r{animation:gest 1.1s ease-in-out infinite alternate}
+.world .pp.talk .arm.l{animation:gest2 1.6s ease-in-out infinite alternate}
+@keyframes idle{50%{transform:translateZ(calc(var(--z) + 1.5px))}}
+@keyframes bob{from{transform:translateZ(var(--z)) rotateX(-4deg)}to{transform:translateZ(calc(var(--z) + 3px)) rotateX(5deg) rotateY(3deg)}}
+@keyframes gest{from{transform:translateZ(var(--z)) rotateX(10deg)}to{transform:translateZ(var(--z)) rotateX(62deg) rotateY(-14deg)}}
+@keyframes gest2{from{transform:translateZ(var(--z)) rotateX(0deg)}to{transform:translateZ(var(--z)) rotateX(28deg)}}
+.face{position:absolute;inset:0}
+.face .fr{position:absolute;left:0;right:0;top:0;height:8px;background:var(--hair)}
+.face .ey{position:absolute;top:14px;width:5px;height:6px;border-radius:50%;background:#1F2430;animation:blinkEye 4s infinite}
+.face .ey.l{left:8px}.face .ey.r{right:8px}
+.face .gl{position:absolute;top:10px;width:11px;height:11px;border:2px solid #1F2430;border-radius:3px}
+.face .gl.l{left:4px}.face .gl.r{right:4px}
+.face .ck{position:absolute;top:21px;width:6px;height:3px;border-radius:50%;background:rgba(232,110,110,.45)}
+.face .ck.l{left:4px}.face .ck.r{right:4px}
+.face .mo{position:absolute;left:50%;top:24px;width:9px;height:3px;margin-left:-4.5px;border-radius:0 0 6px 6px;background:#7A2E2E;transition:.15s}
+.face .bd{position:absolute;left:3px;right:3px;bottom:0;height:9px;border-radius:0 0 8px 8px;background:var(--hair);opacity:.95}
+.world .pp.talk .face .mo{animation:mouth .22s infinite alternate}
+@keyframes mouth{to{height:7px;border-radius:3px 3px 7px 7px}}
+@keyframes blinkEye{0%,46%,50%,100%{transform:scaleY(1)}48%{transform:scaleY(.1)}}
+.shirt{position:absolute;left:50%;top:0;margin-left:-8px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:16px solid #fff}
+.tie{position:absolute;left:50%;top:3px;margin-left:-3px;width:6px;height:26px;background:var(--tie);clip-path:polygon(20% 0,80% 0,100% 85%,50% 100%,0 85%)}
+.world .cut{position:absolute;width:80px;height:90px;display:flex;align-items:flex-end;justify-content:center;transform-origin:50% 100%;line-height:1}
+.fig{display:flex;flex-direction:column;align-items:center}
+.fig .nm{background:#fff;border-radius:10px;padding:4px 9px;text-align:center;font-size:11.5px;font-weight:800;border:1.5px solid var(--line);transition:.25s;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.fig.talk .nm{border-color:var(--c);color:var(--c);transform:scale(1.08)}
+.fig.dim .nm{opacity:.75}
+/* ---------- TABLE ---------- */
+.ctable{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:16px}
+.ctable th{font-family:var(--h);font-size:16px;padding:12px 14px;text-align:left;cursor:pointer;border-radius:14px;transition:.2s}
+.ctable th:first-child{cursor:default;color:var(--muted);font-family:var(--b);font-size:13px;text-transform:uppercase;letter-spacing:.1em}
+.ctable td{background:#fff;padding:11px 12px;font-size:14px;line-height:1.35;border-top:1px solid var(--line);border-bottom:1px solid var(--line);transition:.25s}
+.ctable td:first-child{font-weight:800;border-left:1px solid var(--line);border-radius:14px 0 0 14px;width:170px;cursor:pointer}
+.ctable td:last-child{border-right:1px solid var(--line);border-radius:0 14px 14px 0}
+.ctable.hl td:not(.on):not(:first-child){opacity:.35}
+.ctable td.on{background:var(--cl)!important;font-weight:700}
+.ctable tr.rowon td{background:#FFF9EC}
+.summary{margin-top:10px;padding:14px 18px;border-radius:16px;background:var(--ink);color:#fff;font-size:16px;line-height:1.45;min-height:52px;transition:.3s}
+
+/* ---------- EFFICIENCY ---------- */
+.tabs{display:flex;gap:8px;margin:18px 0 18px;flex-wrap:wrap}
+.tabs button{padding:10px 16px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:800;font-size:14px;transition:.2s}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.effgrid{display:grid;grid-template-columns:1fr 330px;gap:24px}
+.chartbox{background:#fff;border:1px solid var(--line);border-radius:24px;padding:24px 26px;min-height:330px}
+.chartbox h4{font-family:var(--h);font-size:16px;margin-bottom:18px}
+.brow{display:grid;grid-template-columns:210px 1fr;gap:14px;align-items:center;margin-bottom:16px}
+.brow .l{font-weight:700;font-size:15px}
+.btrack{height:38px;background:#F4F1EA;border-radius:12px;position:relative;overflow:hidden}
+.bfill{height:100%;width:0;border-radius:12px;background:var(--c);transition:width 1s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;justify-content:flex-end;padding-right:12px;color:#fff;font-weight:800;font-size:15px;white-space:nowrap}
+.src{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.4}
+.take{background:#FFF7E3;border:1px solid #F3DFAE;border-radius:24px;padding:22px;font-size:17px;line-height:1.5}
+.take strong{font-family:var(--h);font-size:13px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:8px;color:#B7791F}
+.warnbox{margin-top:14px;background:#fff;border:1px dashed #CFC6B4;border-radius:18px;padding:14px 16px;font-size:13.5px;line-height:1.45;color:#4A5263}
+.bignum{font-family:var(--h);font-size:72px;color:var(--usa);line-height:1;margin:10px 0}
+
+/* ---------- CONVERGENCE ---------- */
+.cv-lead{font-size:16px;margin-top:6px;max-width:1100px}
+.conv{display:grid;grid-template-columns:430px 1fr;gap:22px;margin-top:14px}
+.venn{position:relative;height:452px;background:#fff;border:1px solid var(--line);border-radius:26px;overflow:hidden}
+.circ{position:absolute;width:150px;height:150px;border-radius:50%;display:grid;place-items:center;font-family:var(--h);font-size:15px;color:var(--c);
+  background:color-mix(in srgb,var(--c) 13%,transparent);border:3px solid var(--c);transition:all 1.6s cubic-bezier(.2,.8,.2,1);mix-blend-mode:multiply}
+.c1{left:18px;top:18px}.c2{right:18px;top:18px}.c3{left:18px;top:220px}.c4{right:18px;top:220px}
+.venn.near .c1{left:85px;top:68px}.venn.near .c2{right:85px;top:68px}.venn.near .c3{left:85px;top:172px}.venn.near .c4{right:85px;top:172px}
+.venn .mid{position:absolute;left:50%;top:195px;transform:translate(-50%,-50%);font-size:12.5px;font-weight:800;text-align:center;opacity:0;transition:opacity .6s 1.3s;background:#fff;padding:7px 11px;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,.1);z-index:2}
+.venn .mid span{color:var(--muted);font-weight:700}
+.venn.near .mid{opacity:1}
+.vcap{position:absolute;left:16px;right:16px;bottom:62px;text-align:center;font-size:13.5px;font-weight:700;color:var(--muted);line-height:1.35}
+.venn button{position:absolute;left:50%;transform:translateX(-50%);bottom:16px;padding:10px 16px;border-radius:12px;background:var(--ink);color:#fff;font-weight:800;font-size:13px;z-index:3;white-space:nowrap}
+.cvr{display:flex;flex-direction:column;gap:10px}
+.cvtwo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cvbox{border-radius:18px;padding:12px 14px;font-size:13.5px;line-height:1.4;border:1px solid}
+.cvbox.yes{background:var(--good-l);border-color:#BFE6CB}.cvbox.no{background:#FFF4F0;border-color:#F4CFC3}
+.cvbox b{display:block;font-size:14px;margin-bottom:5px}
+.cvbox ul{padding-left:17px;display:grid;gap:3px}
+.cvbox.no ul{list-style:none;padding-left:0}
+.cvan{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:18px;padding:11px 14px;font-size:13.5px;line-height:1.42}
+.cvan span{font-size:26px}
+.cvres{background:#fff;border:1px solid var(--line);border-radius:18px;padding:11px 14px;font-size:13.5px;line-height:1.42}
+.cvres i{color:var(--muted)}
+.cvout{background:var(--ink);color:#fff;border-radius:18px;padding:12px 16px;font-size:14.5px;line-height:1.42}
+
+/* ---------- CONCLUSIONS ---------- */
+.concl{display:grid;grid-template-columns:470px 1fr;gap:26px;margin-top:18px}
+.cl{display:grid;gap:12px}
+.cl div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px 18px;font-size:15px;line-height:1.45;display:flex;gap:14px}
+.cl span{font-family:var(--h);font-size:26px;color:var(--accent);line-height:1}
+.builder{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px 20px}
+.builder h4{font-family:var(--h);font-size:16px;margin-bottom:4px}
+.builder p.s{font-size:13px;color:var(--muted);margin-bottom:10px}
+.pool{display:flex;flex-wrap:wrap;gap:7px}
+.pool button{padding:7px 11px;border-radius:999px;font-size:13px;font-weight:700;border:1.5px solid var(--c);color:var(--c);background:#fff;transition:.2s}
+.pool button.sel{background:var(--c);color:#fff}
+.pool button.anti{--c:#9CA3AF;border-style:dashed}
+.pool button.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.basket{margin-top:12px;min-height:96px;border-radius:18px;background:repeating-linear-gradient(45deg,#FBF9F4,#FBF9F4 10px,#F7F4EC 10px,#F7F4EC 20px);border:2px dashed #DCD3C1;padding:12px;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start}
+.basket .empty{color:var(--muted);font-size:13.5px;font-weight:600;margin:auto}
+.basket span{padding:6px 10px;border-radius:10px;background:var(--c);color:#fff;font-size:12.5px;font-weight:800;animation:pop .3s}
+.verdict{margin-top:10px;font-size:14px;font-weight:700;min-height:22px}
+.brow2{display:flex;gap:8px;margin-top:10px}
+.brow2 button{padding:9px 14px;border-radius:12px;font-weight:800;font-size:13px;background:var(--ink);color:#fff}
+.brow2 button.ghost{background:#F2EEE5;color:var(--ink)}
+.legend{display:flex;gap:10px;margin:2px 0 10px;font-size:12px;font-weight:700;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* ---------- SCORE ---------- */
+.score{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 5px;margin-top:8px}
+.score th:first-child,.score td:first-child{width:200px}
+.score th{font-family:var(--h);font-size:15px;padding:6px 12px;text-align:left}
+.score th:first-child{font-family:var(--b);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.score td{background:#fff;padding:7px 12px;font-size:13.5px;line-height:1.3;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-weight:600}
+.score td:first-child{font-weight:800;width:210px;border-left:1px solid var(--line);border-radius:12px 0 0 12px}
+.score td:first-child small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+.score td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}
+.score td.g,.slegend .g{background:var(--good-l);color:#15803D}
+.score td.m,.slegend .m{background:#FFF6DB;color:#A16207}
+.score td.b,.slegend .b{background:var(--bad-l);color:#B91C1C}
+.score td.n{background:#F4F2EE;color:var(--muted)}
+.slegend{display:flex;gap:8px;justify-content:flex-end;margin-top:2px}
+.slegend span{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px}
+.fin3{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:12px;margin-top:8px}
+.fin3>div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;position:relative}
+.fin3 span{font-family:var(--h);font-size:24px;color:var(--accent);line-height:1}
+.fin3 p{font-size:13.5px;line-height:1.42}
+.fin3 .ua{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fin3 .ua span{color:#FFD879}.fin3 .ua p{flex:1;min-width:0}
+.fin3 .ua button{display:block;margin-top:8px;padding:7px 12px;border-radius:10px;background:#FFD879;color:var(--ink);font-weight:800;font-size:12.5px}
+.bld-bg{position:absolute;inset:0;z-index:60;background:rgba(27,34,50,.32);backdrop-filter:blur(3px);display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.bld-bg.show{opacity:1;pointer-events:auto}
+.bld-bg .builder{width:760px;position:relative;box-shadow:0 30px 70px rgba(0,0,0,.25);padding:22px 24px}
+.bx-close{position:absolute;right:14px;top:12px;width:32px;height:32px;border-radius:10px;background:#F2EEE5;font-weight:800}
+
+/* ---------- FINAL ---------- */
+.final{display:grid;place-items:center;height:100%;text-align:center}
+.finflags{display:flex;gap:14px;justify-content:center;margin-top:30px}
+.finflags span{font-size:34px;width:70px;height:70px;border-radius:20px;display:grid;place-items:center;animation:bob 4s ease-in-out infinite}
+.finflags span:nth-child(2){animation-delay:-1s}.finflags span:nth-child(3){animation-delay:-2s}.finflags span:nth-child(4){animation-delay:-3s}
+.final h1{font-size:72px;line-height:1.05}
+.final h1 em{font-style:normal;color:var(--accent)}
+.srcs{background:#fff;border:1px solid var(--line);border-radius:24px;padding:20px 22px;font-size:12.6px;line-height:1.45;color:#3B4355;max-height:520px;overflow:auto}
+.srcs h4{font-family:var(--h);font-size:14px;margin-bottom:10px;color:var(--ink)}
+.srcs ol{padding-left:18px;display:grid;gap:5px}
+.keys{margin-top:26px;display:grid;gap:8px;font-size:14px;color:var(--muted);font-weight:600}
+.confetti{position:absolute;width:10px;height:14px;top:-20px;border-radius:3px;animation:fall linear forwards;z-index:40;pointer-events:none}
+@keyframes fall{to{transform:translateY(780px) rotate(720deg)}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="progress" id="progress"></div>
+
+  <!-- 1. TITLE -->
+  <section class="slide" data-title="Титул">
+    <div class="title-wrap">
+      <div>
+        <div class="kicker">ІНДЗ · Сучасні технології управління людськими ресурсами</div>
+        <h1>Світові <em>моделі</em> управління людськими ресурсами та їх порівняльна ефективність</h1>
+        <div class="hint-start"><kbd>→</kbd> або <kbd>Пробіл</kbd> — далі · <kbd>N</kbd> — текст доповіді · <kbd>F</kbd> — повний екран</div>
+      </div>
+      <div class="windows">
+        <div class="win" style="left:10px;top:10px;animation-delay:0s" data-jump="3"><div class="pane" style="background:var(--usa-l)">🏙️</div><h4 style="color:var(--usa)">США</h4><small>«Покажи результат»</small></div>
+        <div class="win" style="left:250px;top:50px;animation-delay:-1.2s" data-jump="4"><div class="pane" style="background:var(--jp-l)">🏯</div><h4 style="color:var(--jp)">Японія</h4><small>«Ми — одна команда»</small></div>
+        <div class="win" style="left:30px;top:245px;animation-delay:-2.4s" data-jump="5"><div class="pane" style="background:var(--eu-l)">🏛️</div><h4 style="color:var(--eu)">Європа</h4><small>«Домовимося разом»</small></div>
+        <div class="win" style="left:270px;top:280px;animation-delay:-3.6s" data-jump="6"><div class="pane" style="background:var(--cn-l)">🏮</div><h4 style="color:var(--cn)">Китай</h4><small>«Традиції + ринок»</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. RELEVANCE -->
+  <section class="slide" data-title="Моделі та мета доповіді">
+    <div class="two">
+      <div>
+        <div class="kicker">Тема доповіді</div>
+        <h2>Чотири світові моделі управління людськими ресурсами</h2>
+        <div class="goal" style="margin-top:26px;font-size:18px;padding:20px 22px"><b>Мета:</b> охарактеризувати американську, японську, європейську та китайську моделі й порівняти їхню ефективність.</div>
+      </div>
+      <div class="mcards">
+        <button class="mcard" style="--c:var(--usa)" data-jump="3"><span class="go">↗ офіс</span><div class="flag">🇺🇸</div><h4>Американська</h4><p>Індивідуалізм, конкуренція, оплата за результат</p></button>
+        <button class="mcard" style="--c:var(--jp)" data-jump="4"><span class="go">↗ офіс</span><div class="flag">🇯🇵</div><h4>Японська</h4><p>Довгострокова зайнятість, колектив, якість</p></button>
+        <button class="mcard" style="--c:var(--eu)" data-jump="5"><span class="go">↗ офіс</span><div class="flag">🇪🇺</div><h4>Європейська</h4><p>Соціальне партнерство і правові гарантії</p></button>
+        <button class="mcard" style="--c:var(--cn)" data-jump="6"><span class="go">↗ офіс</span><div class="flag">🇨🇳</div><h4>Китайська</h4><p>Перехідна: від «залізної миски рису» до контрактів</p></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. APPROACHES -->
+  <section class="slide" data-title="«Жорстка» і «м’яка» HRM">
+    <div class="kicker">Теоретична основа</div>
+    <h2>«Жорстка» і «м’яка» HRM: дві філософії управління людьми</h2>
+    <div class="hs">
+      <div class="hcard" style="--c:var(--usa);--cl:var(--usa-l)">
+        <div class="hhead"><span class="hic">⚙️</span><div><h3>«Жорстка» HRM · Мічиганська модель</h3><small>Fombrun, Tichy, Devanna, 1984</small></div></div>
+        <p>Людина — <b>ресурс</b>, яким управляють так само раціонально, як фінансами чи обладнанням. HR-політика повністю підпорядкована стратегії та структурі компанії.</p>
+        <div class="hlab">Що оцінює</div>
+        <p><b>Результативність працівника</b> — центр моделі. Навколо неї будується HR-цикл:</p>
+        <div class="cycle"><span>Відбір</span>→<span>Результативність</span>→<span>Оцінка</span>→<span>Винагорода</span>→<span>Розвиток</span><em>↺</em></div>
+        <div class="hq">Головне питання: «Наскільки ефективно ми використовуємо людей для цілей бізнесу?»</div>
+      </div>
+      <div class="hcard" style="--c:var(--eu);--cl:var(--eu-l)">
+        <div class="hhead"><span class="hic">🌱</span><div><h3>«М’яка» HRM · Гарвардська модель</h3><small>Beer, Spector, Lawrence, Mills, Walton, 1984</small></div></div>
+        <p>Працівники — не витрати, а <b>партнери</b>. HR-рішення враховують інтереси всіх сторін: акціонерів, менеджменту, працівників, профспілок, держави й громади.</p>
+        <div class="hlab">Що оцінює — модель «4С»</div>
+        <div class="cycle four"><span>Відданість</span><span>Компетентність</span><span>Узгодженість інтересів</span><span>Економічна ефективність</span></div>
+        <div class="hq">Довгострокова мета: добробут людей, ефективність організації та суспільства.</div>
+      </div>
+    </div>
+    <div class="spectrum">
+      <div class="ends">
+        <div>⚙️ «Жорсткий» полюс<small>людина — ресурс під стратегію</small></div>
+        <div style="text-align:right">«М’який» полюс 🌱<small>інтереси працівників і суспільства</small></div>
+      </div>
+      <div class="track">
+        <button class="pin" style="left:18%;--c:var(--usa)">🇺🇸<span class="tip">США ближче до «жорсткого» полюса: результат, KPI, людина як ресурс.</span></button>
+        <button class="pin" style="left:46%;--c:var(--cn)">🇨🇳<span class="tip">Китай — гібрид: ринкові контракти поруч із патерналізмом.</span></button>
+        <button class="pin" style="left:68%;--c:var(--jp)">🇯🇵<span class="tip">Японія: людина — особистість, але й високий тиск колективу.</span></button>
+        <button class="pin" style="left:84%;--c:var(--eu)">🇪🇺<span class="tip">Європа: партнерство, соцзахист, інтереси працівників закріплені законом.</span></button>
+      </div>
+      <div class="cond">умовне розміщення для ілюстрації · натискайте на прапорці</div>
+    </div>
+  </section>
+
+  <!-- 4. USA -->
+  <section class="slide" data-title="Американська модель" data-scene="usa" style="--c:var(--usa);--cl:var(--usa-l)">
+    <div class="scene-head">
+      <div><div class="kicker">Модель 1 · Офіс у Нью-Йорку</div><h2><span>Американська</span> модель</h2></div>
+      <div class="kw"><span class="chip">Індивідуалізм</span><span class="chip">Оплата за результат</span><span class="chip">Швидка кар’єра</span><span class="chip">Вузька спеціалізація</span><span class="chip">Формальний контроль</span></div>
+    </div>
+    <div class="scene-body">
+      <div class="left-col">
+        <div class="office o-usa"><div class="label">🏙️ Open space · Нью-Йорк</div><div class="world"></div><div class="hint3d">🖱️ потягніть, щоб покрутити · подвійний клік — скинути</div></div>
+        <div class="pm">
+          <div class="plus"><b>＋ Сильні сторони</b>Практичність і мотивація результатом, швидке зростання сильних, інноваційність</div>
+          <div class="minus"><b>− Слабкі сторони</b>Постійний стрес, конкуренція всередині команди, невдоволення й плинність</div>
+        </div>
+      </div>
+      <div class="chatbox"></div>
+    </div>
+  </section>
+
+  <!-- 5. JAPAN -->
+  <section class="slide" data-title="Японська модель" data-scene="jp" style="--c:var(--jp);--cl:var(--jp-l)">
+    <div class="scene-head">
+      <div><div class="kicker">Модель 2 · Офіс в Осаці</div><h2><span>Японська</span> модель</h2></div>
+      <div class="kw"><span class="chip">Довгострокова зайнятість</span><span class="chip">Оплата за стажем</span><span class="chip">Рінгі-сьо</span><span class="chip">Ротація</span><span class="chip">Гуртки якості</span></div>
+    </div>
+    <div class="scene-body">
+      <div class="left-col">
+        <div class="office o-jp"><div class="label">🏯 Офіс · Осака</div><div class="world"></div><div class="hint3d">🖱️ потягніть, щоб покрутити · подвійний клік — скинути</div></div>
+        <div class="pm">
+          <div class="plus"><b>＋ Сильні сторони</b>Висока якість, лояльність, безперервне навчання й розвиток персоналу</div>
+          <div class="minus"><b>− Слабкі сторони</b>Повільні рішення, тиск і понаднормова робота, мало простору для особистої ініціативи</div>
+        </div>
+      </div>
+      <div class="chatbox"></div>
+    </div>
+  </section>
+
+  <!-- 6. EUROPE -->
+  <section class="slide" data-title="Європейська модель" data-scene="eu" style="--c:var(--eu);--cl:var(--eu-l)">
+    <div class="scene-head">
+      <div><div class="kicker">Модель 3 · Офіс у Мюнхені</div><h2><span>Європейська</span> модель</h2></div>
+      <div class="kw"><span class="chip">Соцпартнерство</span><span class="chip">Профспілки</span><span class="chip">Участь у рішеннях і прибутках</span><span class="chip">Соцзахист за законом</span></div>
+    </div>
+    <div class="scene-body">
+      <div class="left-col">
+        <div class="office o-eu"><div class="label">🏛️ Офіс · Мюнхен</div><div class="world"></div><div class="hint3d">🖱️ потягніть, щоб покрутити · подвійний клік — скинути</div></div>
+        <div class="pm">
+          <div class="plus"><b>＋ Сильні сторони</b>Соціальна захищеність, стабільність, відчуття цінності працівника для колективу</div>
+          <div class="minus"><b>− Слабкі сторони</b>Опір змінам, бюрократизм, довгі процедури ухвалення рішень</div>
+        </div>
+      </div>
+      <div class="chatbox"></div>
+    </div>
+  </section>
+
+  <!-- 7. CHINA -->
+  <section class="slide" data-title="Китайська модель" data-scene="cn" style="--c:var(--cn);--cl:var(--cn-l)">
+    <div class="scene-head">
+      <div><div class="kicker">Модель 4 · Офіс у Шеньчжені</div><h2><span>Китайська</span> модель</h2></div>
+      <div class="kw"><span class="chip">Перехідна модель</span><span class="chip">«Залізна миска рису» → контракти</span><span class="chip">Гуаньсі</span><span class="chip">Конфуціанські цінності</span></div>
+    </div>
+    <div class="scene-body">
+      <div class="left-col">
+        <div class="office o-cn"><div class="label">🏮 Офіс · Шеньчжень</div><div class="world"></div><div class="hint3d">🖱️ потягніть, щоб покрутити · подвійний клік — скинути</div></div>
+        <div class="pm">
+          <div class="plus"><b>＋ Сильні сторони</b>Гнучкість ринкових контрактів, турбота про працівника, швидке запозичення практик</div>
+          <div class="minus"><b>− Слабкі сторони</b>Немає однорідної моделі, інерція старого мислення, ризик кумівства через гуаньсі</div>
+        </div>
+      </div>
+      <div class="chatbox"></div>
+    </div>
+  </section>
+
+  <!-- 8. TABLE -->
+  <section class="slide" data-title="Порівняльна таблиця">
+    <div class="kicker">Порівняння · натискайте на країну або критерій</div>
+    <h2>Чотири моделі — одна таблиця</h2>
+    <table class="ctable" id="ctable">
+      <thead><tr><th>Критерій</th><th data-col="1" style="color:var(--usa)">🇺🇸 США</th><th data-col="2" style="color:var(--jp)">🇯🇵 Японія</th><th data-col="3" style="color:var(--eu)">🇪🇺 Європа</th><th data-col="4" style="color:var(--cn)">🇨🇳 Китай</th></tr></thead>
+      <tbody>
+        <tr><td>Філософія</td><td>Індивідуалізм, прибуток</td><td>Колективізм, довгострокові відносини</td><td>Соціальне партнерство</td><td>Гібрид ринку й традицій, патерналізм</td></tr>
+        <tr><td>Зайнятість</td><td>Мобільність, ризик</td><td>Довгострокова, фактично пожиттєва</td><td>Правовий захист</td><td>Від «залізної миски рису» до трудових контрактів</td></tr>
+        <tr><td>Оплата</td><td>За індивідуальними результатами</td><td>За стажем і груповими показниками</td><td>За кваліфікацією, участь у прибутках</td><td>Від зрівнялівки до оплати за результатом</td></tr>
+        <tr><td>Навчання</td><td>Спецпрограми, вузька спеціалізація</td><td>Безперервне, на підприємстві, ротація</td><td>Безперервне, з університетами</td><td>Запозичення західних і японських практик</td></tr>
+        <tr><td>Оцінка й відповідальність</td><td>Індивідуальна</td><td>Колективна</td><td>Індивідуальна й колективна</td><td>KPI + довіра й особисті зв’язки</td></tr>
+        <tr><td>Ухвалення рішень</td><td>Швидке</td><td>Консенсус (рінгі-сьо), повільне</td><td>Участь працівників, партнерство</td><td>Централізоване, велика роль керівника</td></tr>
+      </tbody>
+    </table>
+    <div class="summary" id="tsum">США ставлять на індивідуальний результат, Японія — на довгострокові відносини й колектив, Європа — на баланс інтересів і правові гарантії, Китай — на поєднання ринку з традиціями.</div>
+  </section>
+
+  <!-- 9. EFFICIENCY -->
+  <section class="slide" data-title="Порівняльна ефективність" id="effSlide">
+    <div class="kicker">Порівняльна ефективність</div>
+    <h2>То яка модель ефективніша? Залежить від критерію</h2>
+    <div class="tabs" id="effTabs">
+      <button data-k="tenure" class="on">⏳ Стабільність зайнятості</button>
+      <button data-k="eng">🔥 Залученість</button>
+      <button data-k="stress">😮‍💨 Стрес</button>
+      <button data-k="jpn">🇯🇵 Зворотний бік «довічного найму»</button>
+    </div>
+    <div class="effgrid">
+      <div class="chartbox" id="chart"></div>
+      <div>
+        <div class="take" id="take"></div>
+        <div class="warnbox">⚠️ Gallup — це опитування. По США та Європі — дані регіонів, по Китаю та Японії — дані країн. Порівняння орієнтовні.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. CONVERGENCE -->
+  <section class="slide" data-title="Чи стануть моделі однаковими?">
+    <div class="kicker">Конвергенція моделей</div>
+    <h2>Чи стануть усі моделі колись однаковими?</h2>
+    <p class="lead cv-lead"><b>Конвергенція</b> — це зближення: країни переймають одна в одної HR-практики, і моделі поступово стають схожішими. Питання в тому, чи зіллються вони зрештою в одну.</p>
+    <div class="conv">
+      <div class="venn" id="venn">
+        <div class="circ c1" style="--c:var(--usa)">США</div>
+        <div class="circ c2" style="--c:var(--jp)">Японія</div>
+        <div class="circ c3" style="--c:var(--eu)">Європа</div>
+        <div class="circ c4" style="--c:var(--cn)">Китай</div>
+        <div class="mid">спільні тренди ✅<br><span>але кожна модель — своя</span></div>
+        <div class="vcap" id="vcap">Натисніть кнопку: моделі зближуються…</div>
+        <button id="vennBtn">▶ Показати зближення</button>
+      </div>
+      <div class="cvr">
+        <div class="cvtwo">
+          <div class="cvbox yes"><b>✅ Що зближується</b>
+            <ul><li>премії та бонуси за результат</li><li>інформування працівників про стратегію й фінанси</li><li>витрати на навчання персоналу</li><li>HR-фахівці у керівництві компаній (70–80% великих організацій у Франції, Іспанії, Швеції, Японії)</li></ul></div>
+          <div class="cvbox no"><b>🚫 Що лишається різним</b>
+            <ul><li>🇺🇸 індивідуальна оплата й легке звільнення</li><li>🇯🇵 довгострокова зайнятість і рінгі-сьо</li><li>🇪🇺 профспілки й соцзахист, закріплені законом</li><li>🇨🇳 роль держави та особистих зв’язків</li></ul></div>
+        </div>
+        <div class="cvan"><span>🚗</span><p><b>Аналогія:</b> усі автовиробники додають навігацію й подушки безпеки, але Toyota від цього не стає Volkswagen. Так і з HR: спільні «опції» з’являються скрізь, а «характер» моделі лишається національним.</p></div>
+        <div class="cvres"><b>Що показало дослідження Cranet</b> (20 000+ організацій, 18 країн, 1989–2000): є <b>спрямована</b> конвергенція — усі рухаються в одному напрямку; немає <b>кінцевої</b> — до однієї спільної моделі ніхто не прийшов <i>(Майрхофер, Брюстер, 2005)</i>.</div>
+        <div class="cvout">👉 Висновок для нас: моделі обмінюються <b>окремими елементами</b>, а не копіюються цілком. Тож і Україні варто запозичувати практики, а не всю модель.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. CONCLUSIONS -->
+  <section class="slide" data-title="Висновки: порівняльна ефективність">
+    <div class="kicker">Висновки · жодна модель не виграє за всіма критеріями</div>
+    <h2>Порівняльна ефективність моделей</h2>
+    <table class="score">
+      <thead><tr><th>Критерій</th><th style="color:var(--usa)">🇺🇸 США</th><th style="color:var(--jp)">🇯🇵 Японія</th><th style="color:var(--eu)">🇪🇺 Європа</th><th style="color:var(--cn)">🇨🇳 Китай</th></tr></thead>
+      <tbody>
+        <tr><td>Стабільність зайнятості<small>середній стаж на одному місці</small></td><td class="b">3,9 року · низька</td><td class="g">12+ років · висока</td><td class="g">≈11 років · висока</td><td class="n">немає порівнянних даних</td></tr>
+        <tr><td>Залученість працівників<small>Gallup, 2026</small></td><td class="g">31% · найвища</td><td class="b">8% · найнижча</td><td class="b">12% · низька</td><td class="m">20% · середня</td></tr>
+        <tr><td>Щоденний стрес<small>менше — краще</small></td><td class="b">50% · найвищий</td><td class="g">39% · нижчий</td><td class="g">39% · нижчий</td><td class="b">48% · високий</td></tr>
+        <tr><td>Швидкість рішень</td><td class="g">швидко</td><td class="b">повільно (рінгі-сьо)</td><td class="b">повільно (погодження)</td><td class="m">централізовано</td></tr>
+        <tr><td>Головна перевага</td><td>мотивація, інновації</td><td>якість, лояльність, навчання</td><td>соцзахист, стабільність</td><td>гнучкість, турбота про людей</td></tr>
+        <tr><td>Ціна моделі</td><td>стрес, плинність кадрів</td><td>понаднормова робота, нерівність постійних і тимчасових</td><td>бюрократія, опір змінам</td><td>непрозорість через особисті зв’язки</td></tr>
+      </tbody>
+    </table>
+    <div class="slegend"><span class="g">сильна сторона</span><span class="m">середньо</span><span class="b">слабка сторона</span></div>
+    <div class="fin3">
+      <div><span>1</span><p><b>Ефективність — це компроміс.</b> Висока залученість у США оплачена найвищим стресом і нестабільністю, а стабільність Японії та Європи — низькою залученістю.</p></div>
+      <div><span>2</span><p><b>Усе залежить від критерію.</b> Питання не «яка модель найкраща?», а «яка відповідає цілям і умовам конкретної компанії?».</p></div>
+      <div class="ua"><span>3</span><p><b>Для України — адаптувати, а не копіювати:</b> оплата за результат (США), навчання й гуртки якості (Японія), соцзахист і участь працівників (Європа). З огляду на євроінтеграцію орієнтир — європейський досвід.<button id="bldBtn">🧪 Зібрати HR-модель для України</button></p></div>
+    </div>
+  </section>
+
+  <!-- 12. FINAL -->
+
+  <div class="bld-bg" id="bldBg"><div class="builder"><button class="bx-close" id="bldClose" title="Закрити">✕</button>
+        <h4>🧪 Зберіть HR-модель для українського підприємства</h4>
+        <p class="s">Оберіть сильні сторони різних моделей. Сірі пунктирні — недоліки моделей, їх краще не переносити.</p>
+        <div class="legend"><span><i style="background:var(--usa)"></i>США</span><span><i style="background:var(--jp)"></i>Японія</span><span><i style="background:var(--eu)"></i>Європа</span><span><i style="background:var(--cn)"></i>Китай</span><span><i style="background:#9CA3AF"></i>недолік</span></div>
+        <div class="pool" id="pool"></div>
+        <div class="basket" id="basket"><span class="empty">Тут з’явиться ваша модель 👇</span></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="brow2"><button id="recBtn">✨ Рекомендоване поєднання</button><button class="ghost" id="clrBtn">Очистити</button></div>
+      </div></div>
+
+  <div class="notes" id="notes"></div>
+
+  <div class="nav">
+    <div class="title" id="navTitle"></div>
+    <div class="dots" id="dots"></div>
+    <div class="navbtns">
+      <button id="notesBtn" title="Текст доповіді (N)">📝</button>
+      <button id="fsBtn" title="Повний екран (F)">⛶</button>
+      <button id="prevBtn" title="Назад (←)">←</button>
+      <button id="nextBtn" title="Далі (→ / Пробіл)">→</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= DATA: SCENES ================= */
+const SCENES = {
+  usa: {
+    chars: {
+      mike:{name:"Майк",role:"Team Lead",e:"👨🏼‍💼",suit:"#2F4A86",skin:"#F2C9A0",hair:"#C9A063",hs:"short",pants:"#26324D",tie:"#E0474C"},
+      sara:{name:"Сара",role:"Sales Manager",e:"👩🏽‍💼",suit:"#6B7FA8",skin:"#C68B5E",hair:"#3B2418",hs:"long",pants:"#2B3242"},
+      jake:{name:"Джейк",role:"Sales Manager",e:"🧑🏻‍💻",suit:"#7A8599",skin:"#F5D2B5",hair:"#2A2A2A",hs:"short",pants:"#3A4152",glasses:1}
+    },
+    good:{
+      cast:[["mike",28,"l"],["sara",70,"r"]],
+      lines:[
+        {sys:"🎬 Квартальний performance review"},
+        {who:"mike",t:"Сара, підсумки кварталу: план виконано на 120%, ти перша в команді."},
+        {who:"sara",t:"Дякую! Тоді давай поговоримо про бонус і позицію Senior."},
+        {who:"mike",t:"Бонус — за твоїм особистим результатом, а з наступного місяця ти Senior. Оцінюємо тебе, не відділ."},
+        {who:"sara",t:"Чудово. Наступного кварталу хочу пройти курс переговорів."},
+        {who:"mike",t:"Компанія оплатить спецпрограму. Ціль на квартал — конкретна цифра, звіримося через 90 днів."},
+        {ins:"good",h:"Плюси моделі",t:"Чіткі індивідуальні цілі, оплата за результат, швидка кар’єра для сильних, навчання за спецпрограмою. Рішення ухвалюються швидко."}
+      ]
+    },
+    bad:{
+      cast:[["mike",28,"l"],["jake",70,"r"]],
+      lines:[
+        {sys:"🎬 Той самий офіс, інший працівник"},
+        {who:"mike",t:"Джейк, у тебе 92% плану. Нагадаю: у нас «up or out» — або ростеш, або йдеш."},
+        {who:"jake",t:"Пів кварталу я навчав двох новачків. Тепер вони самі закривають угоди."},
+        {who:"mike",t:"Цього немає в твоїх KPI. Рахуються лише твої цифри."},
+        {who:"jake",t:"Тобто допомагати колегам — невигідно? Зрозумів…"},
+        {who:"jake",t:"<i>(пізніше, сам до себе)</i> Оновлю резюме. Конкуренти платять більше."},
+        {ins:"bad",h:"Мінуси моделі",t:"Надмірна орієнтація на індивідуальні KPI руйнує командну роботу, дає постійний стрес і плинність. Середній стаж на одному місці у США — лише ≈3,9 року."}
+      ]
+    }
+  },
+  jp: {
+    chars: {
+      tanaka:{name:"Танака-сан",role:"керівник відділу",e:"👨🏻‍💼",suit:"#3B3F4A",skin:"#F1CFA8",hair:"#1E1E1E",hs:"short",pants:"#2B2E36",tie:"#2F6FED",glasses:1},
+      yamada:{name:"Ямада",role:"інженер, 6 років у компанії",e:"🧑🏻‍🔧",suit:"#4F6E8E",skin:"#F1CFA8",hair:"#1E1E1E",hs:"short",pants:"#38404D",helmet:"#F4C430"},
+      sato:{name:"Сато",role:"тимчасовий контракт",e:"👩🏻‍💻",suit:"#A99A8E",skin:"#F3D3B3",hair:"#2A1C14",hs:"bun",pants:"#4A4440"}
+    },
+    good:{
+      cast:[["tanaka",26,"l"],["yamada",70,"r"]],
+      lines:[
+        {sys:"🎬 Ранкові збори відділу"},
+        {who:"yamada",t:"Танака-сан, я підготував рінгі-сьо щодо нової лінії пакування.",pop:"ringi"},
+        {who:"tanaka",t:"Добре. Хто вже поставив печатки?"},
+        {who:"yamada",t:"Начальник цеху, відділ якості та фінансовий відділ. Лишилися директор з виробництва і президент."},
+        {who:"tanaka",t:"Погодження займе час, зате після останньої печатки всі вже в курсі — і запуск піде швидко."},
+        {who:"yamada",t:"Наш гурток якості вже підготував інструкції для робітників зміни.",pop:"qc"},
+        {who:"tanaka",t:"Чудово. І ще: з квітня — ротація у відділ продажів. Ти маєш знати компанію з різних боків."},
+        {ins:"good",h:"Плюси моделі",t:"Колективне ухвалення рішень через рінгі-сьо: погоджують повільно — впроваджують швидко. Ротація кожні 2–3 роки, навчання всередині компанії, гуртки якості для постійного вдосконалення."}
+      ]
+    },
+    bad:{
+      cast:[["tanaka",22,"l"],["yamada",56,"r"],["sato",84,"r"]],
+      lines:[
+        {sys:"🎬 20:45, офіс досі повний"},
+        {who:"yamada",t:"Танака-сан, маю ідею: перевести облік складу в хмарний сервіс. Можна почати вже завтра!"},
+        {who:"tanaka",t:"Цікаво… Але спершу оформи рінгі-сьо й узгодь з усіма відділами. Найближча нарада — за місяць."},
+        {who:"yamada",t:"Зрозумів. Тоді сьогодні знову залишаюся до десятої вечора?"},
+        {who:"tanaka",t:"Ніхто не йде додому раніше за колектив. Так заведено."},
+        {who:"sato",t:"А мене, працівницю на тимчасовому контракті, на наради не кличуть. І надбавок за стаж мені не нараховують."},
+        {ins:"bad",h:"Мінуси моделі",t:"Повільні рішення, щоденна понаднормова робота й мало простору для особистої ініціативи. До того ж стабільність «довічного найму» — не для всіх: 37–38% працівників у Японії мають нестандартну (тимчасову, контрактну чи часткову) зайнятість."}
+      ]
+    }
+  },
+  eu: {
+    chars: {
+      klaus:{name:"Клаус",role:"директор заводу",e:"👨🏼‍💼",suit:"#2E5E57",skin:"#F2C9A0",hair:"#8C6A43",hs:"short",pants:"#24302E",tie:"#E3962A",beard:1},
+      ingrid:{name:"Інгрід",role:"рада працівників",e:"👩🏼",suit:"#159A86",skin:"#F5D7BD",hair:"#E2C27A",hs:"long",pants:"#2B3A38"},
+      louise:{name:"Луїза",role:"інженерка",e:"👩🏻‍🔬",suit:"#F4F4F2",skin:"#EBC2A0",hair:"#6B3E26",hs:"bun",pants:"#2E3A37",glasses:1}
+    },
+    good:{
+      cast:[["klaus",20,"l"],["ingrid",52,"r"],["louise",82,"r"]],
+      lines:[
+        {sys:"🎬 Засідання з радою працівників"},
+        {who:"klaus",t:"Хочемо запровадити новий графік змін. Перш ніж вирішувати — обговоримо з вами."},
+        {who:"ingrid",t:"Дякуємо. Колектив згоден, якщо залишаться доплати за нічні зміни."},
+        {who:"klaus",t:"Залишаємо. А частина прибутку цього року піде в бонусний фонд колективу."},
+        {who:"louise",t:"А хто навчить нас працювати на новому обладнанні?"},
+        {who:"klaus",t:"Без відриву від роботи, разом із технічним університетом."},
+        {ins:"good",h:"Плюси моделі",t:"Соціальне партнерство: працівники беруть участь у рішеннях і прибутках, соцзахист закріплений законом, навчання — разом з університетами."}
+      ]
+    },
+    bad:{
+      cast:[["klaus",20,"l"],["ingrid",52,"r"],["louise",82,"r"]],
+      lines:[
+        {sys:"🎬 Пів року по тому"},
+        {who:"louise",t:"Пропоную перейти на нову CRM — продажі пришвидшаться."},
+        {who:"klaus",t:"Чудово! Потрібні: погодження ради, юридична експертиза й оцінка впливу на робочі місця…"},
+        {who:"ingrid",t:"…і пілот на пів року, щоб ніхто не постраждав."},
+        {who:"louise",t:"Конкуренти запустили таку систему ще навесні."},
+        {who:"klaus",t:"Зате в нас ніхто не скаржиться. Ну, майже."},
+        {ins:"bad",h:"Мінуси моделі",t:"Бюрократія, довгі процедури й опір змінам гальмують інновації. І гарантії ще не означають драйву: залученість у Європі — лише 12% (Gallup, 2026)."}
+      ]
+    }
+  },
+  cn: {
+    chars: {
+      li:{name:"Пан Лі",role:"директор",e:"👴🏻",suit:"#8A3B2E",skin:"#F1CFA8",hair:"#D9D9D9",hs:"grey",pants:"#3A2A26"},
+      mei:{name:"Мей",role:"HR-менеджерка",e:"👩🏻‍💼",suit:"#D08A2A",skin:"#F3D3B3",hair:"#1E1E1E",hs:"long",pants:"#3B3530"},
+      wei:{name:"Чжан Вей",role:"молодий менеджер",e:"🧑🏻",suit:"#5A5F6E",skin:"#F1CFA8",hair:"#1E1E1E",hs:"short",pants:"#2E3240",glasses:1}
+    },
+    good:{
+      cast:[["li",20,"l"],["mei",52,"r"],["wei",82,"r"]],
+      lines:[
+        {sys:"🎬 Нарада про найм нових працівників"},
+        {who:"mei",t:"Пане Лі, новим працівникам пропонуємо трирічні трудові контракти й оцінювання за KPI — як у західних компаніях."},
+        {who:"li",t:"Згоден. Але не забуваймо про людей: гуртожиток, їдальня, свято для родин працівників."},
+        {who:"mei",t:"А ще — командні премії та наставники для новачків, як у японських компаніях."},
+        {who:"wei",t:"Мій батько тридцять років пропрацював на державному заводі — мав «залізну миску рису». У мене контракт, зате я бачу, куди можу вирости.",pop:"bowl"},
+        {who:"li",t:"Сьогодні гарантія — не посада, а твій результат і довіра команди."},
+        {ins:"good",h:"Плюси моделі",t:"Гібрид «з китайською специфікою»: ринкові контракти й KPI — із Заходу, командна робота — з Японії, а ще традиційна турбота керівника про працівників."}
+      ]
+    },
+    bad:{
+      cast:[["li",20,"l"],["mei",52,"r"],["wei",82,"r"]],
+      lines:[
+        {sys:"🎬 Вакансія керівника складу"},
+        {who:"li",t:"Мей, на посаду керівника складу візьмемо сина мого давнього партнера. Я знаю цю родину двадцять років — це гуаньсі.",pop:"guanxi"},
+        {who:"mei",t:"Але є кандидат із восьмирічним досвідом і кращими результатами тестування…"},
+        {who:"li",t:"Досвіду можна набути. А довіру — ні."},
+        {who:"wei",t:"<i>(тихо)</i> Виходить, тут вирішують не результати, а зв’язки?"},
+        {ins:"bad",h:"Мінуси моделі",t:"Коли особисті зв’язки підміняють прозорий відбір, сильні кандидати програють, а мотивація команди падає. Водночас однорідної «китайської моделі» немає: практики різняться за розміром, регіоном і формою власності підприємства."}
+      ]
+    }
+  }
+};
+
+/* ================= DATA: NOTES ================= */
+const NOTES = [
+ ["Доброго дня, шановний викладачу, шановні колеги! Тема моєї доповіді — «Світові моделі управління людськими ресурсами та їх порівняльна ефективність»."],
+ ["Те, як компанія наймає, навчає, оплачує й утримує людей, значною мірою залежить від країни, у якій вона працює: від культури, законодавства, традицій трудових відносин. Тому у світі склалося кілька відмінних моделей управління персоналом.","Для України це питання практичне: в умовах євроінтеграції підприємствам потрібно розуміти, що можна інтегрувати з інших моделей, а що краще не переносити.","Мета доповіді — охарактеризувати американську, японську, європейську та китайську моделі й порівняти їхню ефективність."],
+ ["Щоб порівнювати моделі, потрібна теоретична основа. У теорії управління людськими ресурсами розрізняють «жорстку» і «м’яку» моделі — обидві з’явилися 1984 року.","«Жорстка» — Мічиганська модель (Фомбрун, Тічі, Деванна). Людина тут — ресурс, яким управляють так само раціонально, як фінансами чи обладнанням, а HR-політика підпорядкована стратегії бізнесу. Центр моделі — результативність працівника. Навколо неї будується HR-цикл: відбір, оцінка результатів, винагорода й розвиток. Головне питання моделі: наскільки ефективно компанія використовує людей для досягнення своїх цілей.","«М’яка» — Гарвардська модель (Бір та колеги). Вона враховує інтереси всіх зацікавлених сторін — акціонерів, менеджменту, працівників, профспілок, держави — і оцінює результати за «4С»: відданість працівників, їхню компетентність, узгодженість інтересів і економічну ефективність. Довгострокова мета — добробут людей, ефективність організації й суспільства.","Ці дві філософії допомагають зрозуміти національні моделі: американська ближча до «жорсткого» полюса, європейська — до «м’якого», а японська й китайська поєднують риси обох."],
+ ["Ключові слова американської моделі — індивідуалізм, конкуренція, орієнтація на прибуток. Оплата тісно пов’язана з індивідуальними результатами, кар’єра може бути швидкою, спеціалізація — вузькою, а персонал підбирають за освітою, досвідом і навичками. Навчання проводять за спеціальними програмами, контроль жорстко формалізований, оцінка й відповідальність індивідуальні. Рішення ухвалюються швидко, хоча реалізуються повільніше.","Сильна сторона — практичність, що добре працює в умовах жорсткої конкуренції. Слабкі — постійний стрес, нижча гнучкість при зміні завдань і невдоволення працівників (Воскобійник, 2018; Зварич, Коґут, 2023).","👉 Далі — сцена: спочатку плюси моделі, потім її мінуси."],
+ ["В основі японської моделі — людина як особистість, а не лише робоча сила. Традиційно це довгострокова, фактично пожиттєва зайнятість, оплата за стажем і груповими результатами, повільне просування. Працівників беруть переважно з навчальних закладів і навчають безперервно, на підприємстві. Кожні два-три роки — ротація.","Рішення ухвалюються колективно за системою «рінгі-сьо»: це документ-пропозиція, який послідовно погоджують усі причетні підрозділи, ставлячи свої печатки. А гуртки якості — це невеликі групи працівників, які регулярно шукають, як покращити якість на своїй ділянці. Відповідальність — групова.","Результат — висока якість продукції, лояльність і розвиток персоналу. Ціна — надмірний тиск, понаднормова робота, обмеження особистої ініціативи, повільне ухвалення рішень (Шкурат, 2016; Зварич, Коґут, 2023)."],
+ ["Європейська модель найменш однорідна, адже відображає особливості окремих країн, але спільні риси є: партнерство керівництва й працівників, участь персоналу в прибутках і ухваленні рішень, важлива роль профспілок, соціальний захист, закріплений законодавчо, безперервне навчання, зокрема із залученням університетів. Оцінка поєднує індивідуальні та колективні результати, а увага приділяється й морально-психологічному клімату.","Сильні сторони — соціальна захищеність і стабільність. Слабкі — опір змінам, який ускладнює впровадження інновацій, бюрократизм і довгі процедури ухвалення рішень (Воскобійник, 2018; Зварич, Коґут, 2023)."],
+ ["Китайську модель називають перехідною. До реформ державні підприємства трималися на принципі «залізної миски рису». Так називали гарантовану довічну роботу: «залізну» миску неможливо розбити, тож працівника практично не звільняли, а підприємство забезпечувало житлом, медициною й пенсією «від колиски до могили». Реформи з 1978 року поступово замінили цю систему трудовими контрактами, але інерція старого мислення довго стримувала зміни (Дінг, Гудалл, Уорнер, 2000).","Сьогодні практику описують як гібрид західного та японського впливів «з китайською специфікою» (Уорнер, 2004). Велику роль відіграють гуаньсі — мережа особистих зв’язків і взаємних зобов’язань — та конфуціанські цінності. Однорідної моделі немає: практики різняться залежно від розміру, регіону й форми власності підприємства (Чжу, Уорнер, 2000)."],
+ ["Отже, США роблять ставку на індивідуальний результат, Японія — на довгострокові відносини й колектив, Європа — на баланс інтересів і правові гарантії, Китай — на поєднання ринкових контрактів із традиціями й патерналізмом.","У США працівник мобільніший, але менш захищений; в Японії — захищений, але прив’язаний до компанії; в Європі — захищений законом, проте система менш гнучка; у Китаї — працює за ринковим контрактом, але важать і особисті зв’язки, а рішення ухвалюються переважно централізовано."],
+ ["Чи можна сказати, яка модель ефективніша? Усе залежить від критерію. Розгляну кілька.","Перший — стабільність зайнятості. У США середній стаж на одному місці — близько 3,9 року, в країнах ОЕСР — близько 10, у Японії — понад 12 (ITIF, 2025). У шести країнах Західної Європи він десятиліттями тримався біля 11 років (Ґулар, Ош). Для Китаю порівнянної національної статистики немає. Японська стабільність має зворотний бік: частка працівників із нестандартною зайнятістю зросла з 16% у 1985 році до понад 32% у 2005-му й нині становить 37–38%.","Другий — залученість. За даними Gallup 2026 року, у США й Канаді залучені 31% працівників, у Китаї — 20%, як і в середньому у світі, у Європі — 12%, а в Японії — лише 8%. Отже, найнижча залученість — там, де найбільше гарантій.","Третій — стрес. Найвищий він у США й Канаді (50%) та Китаї (48%), тобто там, де головне — результат. У Японії та Європі — 39%.","Застереження: Gallup — це опитування, тому такі порівняння орієнтовні."],
+ ["Останнє питання: чи стануть усі моделі колись однаковими? Зближення моделей у науці називають конвергенцією — коли країни переймають одна в одної HR-практики.","Найбільше дослідження на цю тему — мережа Cranet: понад 20 тисяч організацій у 18 країнах за 1989–2000 роки. Відповідь така: є «спрямована» конвергенція, тобто всі рухаються в одному напрямку, — майже скрізь зростають премії за результат, інформування працівників і витрати на навчання. Але «кінцевої» конвергенції немає — до однієї спільної моделі ніхто не прийшов, національні відмінності зберігаються (Майрхофер, Брюстер, 2005). Показово й те, що у Франції, Іспанії, Швеції та Японії старші HR-фахівці входять до керівних рад у 70–80% організацій з понад 200 працівників (Брюстер, Хаак-Сахем, 2020).","Що лишається різним: у США — індивідуальна оплата й легке звільнення, в Японії — довгострокова зайнятість і рінгі-сьо, у Європі — профспілки й соцзахист, закріплені законом, у Китаї — роль держави та особистих зв’язків.","Це як з автомобілями: усі виробники додають навігацію й подушки безпеки, але Toyota не стає Volkswagen. Тож моделі обмінюються окремими елементами, а не копіюються цілком — і Україні теж варто запозичувати практики, а не всю модель."],
+ ["Підсумую порівняльну ефективність моделей. Жодна з них не виграє за всіма критеріями. За стабільністю зайнятості лідирують Японія та Європа, а США — найменш стабільні. Зате за залученістю попереду США — 31%, тоді як в Японії лише 8%, у Європі — 12%, у Китаї — 20%. Водночас у США найвищий рівень стресу — 50%, у Китаї — 48%, в Японії та Європі — 39%. Рішення найшвидше ухвалюють у США, найповільніше — в Японії та Європі.","Звідси перший висновок: ефективність — це завжди компроміс. Висока залученість у США оплачена стресом і нестабільністю, а стабільність Японії та Європи — низькою залученістю.","Другий висновок: ефективність залежить від критерію й умов. Питання не в тому, яка модель найкраща, а в тому, яка відповідає цілям і умовам конкретної компанії.","Третій висновок — для України: доцільно не копіювати чужий досвід, а адаптувати його. Оплату за результат і інноваційність можна взяти з американської моделі, безперервне навчання й гуртки якості — з японської, соціальний захист і участь працівників в ухваленні рішень — з європейської (Воскобійник, 2018; Зварич, Коґут, 2023). З огляду на євроінтеграцію головним орієнтиром для нас є європейський досвід.","Дякую за увагу! Готовий відповісти на запитання."]
+];
+
+/* ================= DATA: EFFICIENCY ================= */
+const EFF = {
+  tenure:{h:"Середній стаж на одному місці роботи, років",max:13,rows:[
+    {l:"🇺🇸 США",v:3.9,lab:"3,9",c:"var(--usa)"},
+    {l:"🌐 ОЕСР, середнє",v:10,lab:"≈10",c:"#9CA3AF"},
+    {l:"🇪🇺 Зах. Європа (6 країн)",v:11,lab:"≈11",c:"var(--eu)"},
+    {l:"🇯🇵 Японія",v:12.1,lab:"12+",c:"var(--jp)"}],
+    take:"Японія та Європа — найстабільніші. США — чемпіон мобільності: люди легко змінюють роботу. Для Китаю порівнянної національної статистики немає.",
+    src:"BLS 2024 та ОЕСР 2023 (за ITIF, 2025); Goulart & Oesch, 1993–2021; Японія — 2022."},
+  eng:{h:"Залучені працівники, % (Gallup, 2026)",max:35,rows:[
+    {l:"🇺🇸 США і Канада",v:31,lab:"31%",c:"var(--usa)"},
+    {l:"🇨🇳 Китай",v:20,lab:"20%",c:"var(--cn)"},
+    {l:"🌐 Світ",v:20,lab:"20%",c:"#9CA3AF"},
+    {l:"🇪🇺 Європа",v:12,lab:"12%",c:"var(--eu)"},
+    {l:"🇯🇵 Японія",v:8,lab:"8%",c:"var(--jp)"}],
+    take:"Найнижча залученість — у Японії (8%) і Європі (12%), де найбільше гарантій. Китай — на рівні світового середнього. Гарантії ще не дають драйву.",
+    src:"Gallup, State of the Global Workplace: 2026 Report (дані за 2025 рік): США і Канада, Європа — регіональні дані; Китай, Японія — дані по країнах."},
+  stress:{h:"Відчувають значний щоденний стрес, % (Gallup, 2026)",max:55,rows:[
+    {l:"🇺🇸 США і Канада",v:50,lab:"50%",c:"var(--usa)"},
+    {l:"🇨🇳 Китай",v:48,lab:"48%",c:"var(--cn)"},
+    {l:"🌐 Світ",v:40,lab:"40%",c:"#9CA3AF"},
+    {l:"🇯🇵 Японія",v:39,lab:"39%",c:"var(--jp)"},
+    {l:"🇪🇺 Європа",v:39,lab:"39%",c:"var(--eu)"}],
+    take:"Найвищий стрес — у США (50%) і Китаї (48%), де головне — результат. У Японії та Європі — 39%, трохи нижче за світовий рівень.",
+    src:"Gallup, State of the Global Workplace: 2026 Report."},
+  jpn:{h:"Частка працівників із нестандартною (тимчасовою, контрактною, частковою) зайнятістю в Японії, %",max:42,rows:[
+    {l:"1985",v:16.4,lab:"16,4%",c:"#F2A3A6"},
+    {l:"1995",v:20.9,lab:"20,9%",c:"#EC8387"},
+    {l:"2005",v:32.6,lab:"32,6%",c:"#E5636A"},
+    {l:"з 2014 року",v:37.5,lab:"37–38%",c:"var(--jp)"}],
+    take:"«Довічний найм» — для ядра: серед працівників 30–44 років ≈70% зберігають місце 10 років. Поряд росте «друга лінія» без гарантій.",
+    src:"Мін. охорони здоров’я, праці та добробуту Японії (за The Japan Times, 2019); Kambayashi & Kato, 2017."},
+};
+
+/* ================= DATA: BUILDER ================= */
+const POOL = [
+  {t:"Оплата за результат",m:"usa"},{t:"Швидка кар’єра для сильних",m:"usa"},{t:"Готовність до інновацій",m:"usa"},
+  {t:"Безперервне навчання",m:"jp"},{t:"Гуртки якості",m:"jp"},{t:"Ротація кадрів",m:"jp"},{t:"Довгострокові відносини",m:"jp"},
+  {t:"Соціальний захист",m:"eu"},{t:"Участь працівників у рішеннях",m:"eu"},{t:"Навчання з університетами",m:"eu"},
+  {t:"Гнучкі трудові контракти",m:"cn"},{t:"Турбота про працівника",m:"cn"},
+  {t:"Звільнення за один слабкий квартал",m:"anti",why:"Постійний стрес і плинність кадрів"},
+  {t:"Щоденна понаднормова робота",m:"anti",why:"Виснаження працівників"},
+  {t:"Багатомісячні погодження",m:"anti",why:"Бюрократія гальмує зміни"},
+  {t:"Найм за знайомством",m:"anti",why:"Непрозорий відбір"}
+];
+const REC = ["Оплата за результат","Готовність до інновацій","Безперервне навчання","Гуртки якості","Соціальний захист","Участь працівників у рішеннях"];
+const MC = {usa:"var(--usa)",jp:"var(--jp)",eu:"var(--eu)",cn:"var(--cn)",anti:"#9CA3AF"};
+
+
+/* ================= POPUPS ================= */
+const POPS={
+ ringi:{c:"var(--jp)",cl:"var(--jp-l)",i:"📜",t:"Рінгі-сьо (稟議書)",s:"японська система колективного погодження рішень",
+  b:`<p><b>Що це:</b> письмовий документ із пропозицією — купити обладнання, змінити процес, запустити проєкт. Зазвичай його готує працівник нижчого чи середнього рівня.</p>
+     <p><b>Як працює:</b> документ по черзі проходить усі причетні відділи й рівні управління. Кожен керівник ставить особисту печатку (ханко) на знак згоди — або повертає документ на доопрацювання.</p>
+     <div class="flow"><div><b>👷</b>Ініціатор</div><i>→</i><div><b>🏭</b>Цех<br><span class="stamp">印</span></div><i>→</i><div><b>🔍</b>Якість<br><span class="stamp">印</span></div><i>→</i><div><b>💴</b>Фінанси<br><span class="stamp">印</span></div><i>→</i><div><b>👔</b>Директор<br><span class="stamp" style="background:#ddd">?</span></div><i>→</i><div><b>🏢</b>Президент<br><span class="stamp" style="background:#ddd">?</span></div></div>
+     <p>Перед офіційним погодженням ідею неформально обговорюють з усіма — це називають <b>«немавасі»</b> (буквально «обкопування коріння» перед пересадкою дерева).</p>
+     <div class="pc"><div class="p"><b>＋</b> Усі в курсі й підтримують рішення, тому впровадження йде швидко.</div><div class="m"><b>−</b> Погодження триває довго, а відповідальність «розмита» між багатьма людьми.</div></div>`},
+ qc:{c:"var(--jp)",cl:"var(--jp-l)",i:"🔍",t:"Гурток якості",s:"quality circle · 品質管理サークル · японська практика з 1962 року",
+  b:`<p><b>Що це:</b> невелика група з 5–10 працівників одного підрозділу, які регулярно збираються, щоб знаходити й розв’язувати проблеми якості на своїй ділянці.</p>
+     <p><b>Як працює:</b> група сама обирає проблему, аналізує причини, пропонує рішення й представляє його керівництву. Найкращі ідеї впроваджують.</p>
+     <div class="flow"><div><b>🧩</b>Проблема</div><i>→</i><div><b>🔎</b>Аналіз причин</div><i>→</i><div><b>💡</b>Рішення</div><i>→</i><div><b>📣</b>Презентація</div><i>→</i><div><b>⚙️</b>Впровадження</div></div>
+     <p>Гуртки якості — основа <b>«кайдзен»</b>, філософії безперервного вдосконалення. Термін усталений в українських підручниках з менеджменту.</p>`},
+ bowl:{c:"var(--cn)",cl:"var(--cn-l)",i:"🥣",t:"«Залізна миска рису» (铁饭碗)",s:"система гарантованої довічної зайнятості в Китаї до ринкових реформ",
+  b:`<p><b>Що це:</b> так у Китаї називали роботу на державному підприємстві. Миска «залізна», бо її неможливо розбити: працівника практично не звільняли, хоч би як він працював.</p>
+     <p><b>Що давало підприємство:</b> усе «від колиски до могили» — житло, медицину, пенсію, школи й дитячі садки для родин працівників.</p>
+     <div class="flow"><div><b>🥣</b>До 1978<br>Робота на все життя</div><i>→</i><div><b>🔧</b>1978<br>Початок реформ</div><i>→</i><div><b>📝</b>1986<br>Контракти для нових працівників</div><i>→</i><div><b>⚖️</b>1994<br>Закон про працю: контракти для всіх</div></div>
+     <div class="pc"><div class="p"><b>＋</b> Повна соціальна захищеність і стабільність.</div><div class="m"><b>−</b> Зрівнялівка в оплаті, слабка мотивація, надлишок персоналу.</div></div>`},
+ guanxi:{c:"var(--cn)",cl:"var(--cn-l)",i:"🤝",t:"Гуаньсі (关系, guanxi)",s:"мережа особистих зв’язків і взаємних зобов’язань",
+  b:`<p><b>Що це:</b> буквально — «стосунки, зв’язки». Довіра в Китаї часто будується через знайомства, родину, спільне навчання чи минулу роботу. Зроблена послуга передбачає відповідну послугу.</p>
+     <div class="pc"><div class="p"><b>＋ У бізнесі</b> гуаньсі допомагає швидко домовлятися, знаходити партнерів і вирішувати питання.</div><div class="m"><b>− Для HR</b> це ризик: коли зв’язки важать більше за компетенції, найм і просування стають непрозорими.</div></div>`}
+};
+const popBg=document.createElement('div'); popBg.className='pop-bg';
+popBg.innerHTML='<div class="pop"></div>'; document.getElementById('stage').appendChild(popBg);
+function showPop(k){
+  const d=POPS[k]; if(!d) return;
+  const el=popBg.querySelector('.pop'); el.style.setProperty('--pc',d.c); el.style.setProperty('--pcl',d.cl);
+  el.innerHTML=`<div class="ph"><div class="pi">${d.i}</div><div><h3>${d.t}</h3><div class="ps">${d.s}</div></div></div>${d.b}<div class="pf"><small>Пробіл, Esc або клік поза вікном — закрити</small><button>Зрозуміло ✓</button></div>`;
+  popBg.classList.add('show');
+}
+function closePop(){ popBg.classList.remove('show'); }
+const popOpen=()=>popBg.classList.contains('show');
+popBg.addEventListener('click',e=>{ if(e.target===popBg||e.target.closest('.pf button')) closePop(); });
+document.addEventListener('click',e=>{ const b=e.target.closest('.info'); if(b){ e.stopPropagation(); showPop(b.dataset.pop); } });
+
+/* ================= CORE ================= */
+const stage = document.getElementById('stage');
+const slides = [...document.querySelectorAll('.slide')];
+const dotsEl = document.getElementById('dots');
+let cur = -1;
+
+function fit(){
+  const s = Math.min(innerWidth/1300, innerHeight/740);
+  stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+slides.forEach((s,i)=>{
+  const b=document.createElement('button'); b.title=s.dataset.title; b.onclick=()=>go(i); dotsEl.appendChild(b);
+});
+
+function go(i){
+  closePop(); if(typeof bldBg!=='undefined') bldBg.classList.remove('show');
+  i = Math.max(0, Math.min(slides.length-1, i));
+  if(i===cur) return;
+  slides.forEach((s,k)=>{ s.classList.toggle('active',k===i); s.classList.toggle('past',k<i); });
+  cur = i;
+  [...dotsEl.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+  document.getElementById('progress').style.width = ((i+1)/slides.length*100)+'%';
+  document.getElementById('navTitle').textContent = (i+1)+' / '+slides.length+' · '+slides[i].dataset.title;
+  renderNotes();
+  onEnter(slides[i]);
+}
+
+function onEnter(s){
+  if(s.dataset.scene){ const st=STATE[s.dataset.scene]; if(st.idx===0 && !st.typing) setTimeout(()=>{ if(slides[cur]===s && STATE[s.dataset.scene].idx===0) nextLine(s.dataset.scene); },500); }
+  if(s.id==='effSlide') showEff(currentEff);
+  if(s.dataset.title==='Дякую за увагу') confetti();
+}
+
+function advance(){
+  if(popOpen()){ closePop(); return; }
+  if(bldOpen()){ bldBg.classList.remove('show'); return; }
+  const s = slides[cur];
+  if(s.dataset.scene && nextLine(s.dataset.scene)) return;
+  go(cur+1);
+}
+
+
+/* ================= 3D OFFICES ================= */
+const W3=440,D3=340;
+const sky='<div style="position:absolute;inset:0;background:linear-gradient(#BFD8FF,#EFF6FF)"></div>'+[[8,22,52],[34,16,78],[54,24,40],[82,14,86],[100,26,58]].map(([l,w,hh])=>`<div style="position:absolute;bottom:0;left:${l}px;width:${w}px;height:${hh}px;background:#9DB3D6;border-radius:2px 2px 0 0"></div>`).join('');
+const winStyle='border:6px solid #fff;border-radius:8px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.08)';
+const bars=(c,hs)=>`<div style="display:flex;align-items:flex-end;gap:5px;height:44px;margin-top:5px">${hs.map(v=>`<i style="flex:1;height:${v}%;background:${c};border-radius:3px 3px 0 0"></i>`).join('')}</div>`;
+const THEMES={
+ usa:{
+  back:[
+   {x:24,y:26,w:130,h:96,html:sky,st:winStyle},
+   {x:176,y:22,w:120,cls:'poster',html:'📈 KPI · Q3'+bars('#2F6FED',[35,55,48,92])},
+   {x:316,y:28,w:96,cls:'poster',html:'<div style="text-align:center">⭐<br>Працівник<br>місяця</div>'}],
+  left:[{x:40,y:30,w:110,h:80,html:sky,st:winStyle},{x:190,y:36,w:110,cls:'poster',html:'<div style="font-size:30px;text-align:center">🕘</div><div style="text-align:center">Час — гроші</div>'}],
+  boxes:[{x:250,y:40,w:160,d:56,h:40},{x:40,y:40,w:150,d:56,h:40}],
+  props:[{e:'💻',x:290,y:66,z:40,s:30},{e:'☕',x:370,y:72,z:40,s:22},{e:'🖥️',x:100,y:66,z:40,s:30},{e:'🪴',x:24,y:300,s:44}]
+ },
+ jp:{
+  back:[
+   {x:20,y:24,w:120,h:100,st:'background:#FFFDF7;background-image:linear-gradient(90deg,#D9C7A8 2px,transparent 2px),linear-gradient(#D9C7A8 2px,transparent 2px);background-size:24px 24px;border:6px solid #B99A6B;border-radius:4px'},
+   {x:160,y:24,w:170,cls:'poster',html:'📜 Рінгі-сьо<div style="display:flex;gap:5px;margin-top:6px">'+[1,1,1,0,0].map(o=>`<i style="width:24px;height:24px;border-radius:50%;${o?'background:#E0474C;transform:rotate(-12deg);color:#fff':'border:2px dashed #E6B7B7'};display:grid;place-items:center;font-style:normal;font-size:10px">${o?'印':''}</i>`).join('')+'</div><div style="color:#6B7280;font-weight:600;margin-top:4px">3 з 5 печаток</div>'},
+   {x:352,y:20,w:46,cls:'poster',html:'<div style="writing-mode:vertical-rl;font-size:20px;color:#E0474C">改善</div>'}],
+  left:[{x:60,y:30,w:110,cls:'poster',html:'<div style="text-align:center">🧹 5S<br><span style="font-weight:600;color:#6B7280">порядок на місці</span></div>'},{x:200,y:24,w:100,h:96,st:'background:#FFFDF7;background-image:linear-gradient(90deg,#D9C7A8 2px,transparent 2px),linear-gradient(#D9C7A8 2px,transparent 2px);background-size:24px 24px;border:6px solid #B99A6B;border-radius:4px'}],
+  boxes:[{x:150,y:50,w:220,d:46,h:38},{x:150,y:96,w:220,d:46,h:38}],
+  props:[{e:'🍵',x:200,y:76,z:38,s:22},{e:'🖥️',x:300,y:76,z:38,s:28},{e:'🗂️',x:240,y:122,z:38,s:24},{e:'🎍',x:26,y:300,s:42}]
+ },
+ eu:{
+  back:[
+   {x:20,y:22,w:170,h:104,st:winStyle+';background:linear-gradient(#CDEBDD,#F2FBF6);font-size:30px;display:flex;align-items:flex-end;justify-content:space-around',html:'🌳🌲🌳'},
+   {x:210,y:24,w:190,cls:'poster',html:'📌 Рада працівників<div style="font-weight:600;color:#6B7280;margin-top:4px">Четвер, 14:00 · новий графік змін</div>'}],
+  left:[{x:50,y:28,w:130,cls:'poster',html:'<div style="text-align:center">🎓 Навчання<br><span style="font-weight:600;color:#6B7280">з технічним університетом</span></div>'},{x:210,y:30,w:96,cls:'poster',html:'<div style="text-align:center">🤝<br>Соціальне<br>партнерство</div>'}],
+  boxes:[{x:225,y:80,w:20,d:20,h:40},{x:160,y:50,w:150,d:80,h:42,r:'50%'}],
+  props:[{e:'☕',x:200,y:88,z:42,s:22},{e:'📄',x:260,y:84,z:42,s:22},{e:'🚲',x:40,y:300,s:42},{e:'🪴',x:410,y:30,s:40}]
+ },
+ cn:{
+  back:[
+   {x:20,y:28,w:150,cls:'poster',html:'🕰️ 1978 → сьогодні<div style="font-weight:600;color:#6B7280;margin-top:4px">держпідприємство → ринкові контракти</div>'},
+   {x:190,y:22,w:130,cls:'poster',html:'📊 KPI команди'+bars('#E3962A',[50,62,74,88])},
+   {x:342,y:40,w:62,cls:'poster',html:'<div style="font-size:18px;color:#E0474C;text-align:center">团队</div>'}],
+  left:[{x:60,y:30,w:120,cls:'poster',html:'<div style="text-align:center">🍜 Їдальня<br><span style="font-weight:600;color:#6B7280">і гуртожиток для працівників</span></div>'}],
+  boxes:[{x:240,y:46,w:170,d:56,h:40}],
+  props:[{e:'🍵',x:270,y:74,z:40,s:22},{e:'📱',x:330,y:74,z:40,s:20},{e:'💻',x:380,y:72,z:40,s:26},{e:'🏮',x:120,y:30,z:150,s:38,cls:'lantern'},{e:'🏮',x:330,y:20,z:150,s:38,cls:'lantern'},{e:'🎋',x:26,y:300,s:42}]
+ }
+};
+function boxHTML(b){
+  const {x,y,w,d,h,r}=b;
+  const top=`<i style="left:0;top:0;width:${w}px;height:${d}px;background:var(--desk);transform:translateZ(${h}px);border-radius:${r||'4px'};box-shadow:inset 0 0 0 2px rgba(0,0,0,.04)"></i>`;
+  if(r) return `<div class="bx" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px">${top}</div>`;
+  return `<div class="bx" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px">${top}
+   <i style="left:0;top:${d-h}px;width:${w}px;height:${h}px;background:var(--deskS);transform-origin:50% 100%;transform:rotateX(-90deg)"></i>
+   <i style="left:0;top:${-h}px;width:${w}px;height:${h}px;background:var(--deskS);transform-origin:50% 100%;transform:rotateX(-90deg)"></i>
+   <i style="left:${w}px;top:0;width:${h}px;height:${d}px;background:var(--deskS2);transform-origin:0 50%;transform:rotateY(-90deg)"></i>
+   <i style="left:${-h}px;top:0;width:${h}px;height:${d}px;background:var(--deskS2);transform-origin:100% 50%;transform:rotateY(90deg)"></i></div>`;
+}
+const mk=(x,y,z)=>`<div class="mk" style="left:${x}px;top:${y}px;transform:translateZ(${z||0}px)"><div class="stick"></div></div>`;
+const ovi=(inner,extra='')=>`<div class="ovi" ${extra}><div class="pe">${inner}</div></div>`;
+const wallItems=arr=>arr.map(o=>`<div class="${o.cls||''}" style="left:${o.x}px;top:${o.y}px;width:${o.w}px;${o.h?`height:${o.h}px;`:''}${o.st||''}">${o.html||''}</div>`).join('');
+
+
+function cube(w,d,h,z,col,o={}){
+  const fr=o.front||'', side=o.side||col, sideL=o.sideL||side, sideR=o.sideR||side;
+  return `<div class="cb" style="left:${-w/2+(o.x||0)}px;top:${-d/2+(o.y||0)}px;width:${w}px;height:${d}px;transform:translateZ(${z}px)">`
+   +`<i class="tp" style="width:${w}px;height:${d}px;background:${o.top||col};transform:translateZ(${h}px)"></i>`
+   +`<i class="bk" style="top:${-h}px;width:${w}px;height:${h}px;background:${o.back||col};transform-origin:50% 100%;transform:rotateX(-90deg)"></i>`
+   +`<i class="s" style="left:${w}px;width:${h}px;height:${d}px;background:${sideR};transform-origin:0 50%;transform:rotateY(-90deg)"></i>`
+   +`<i class="s" style="left:${-h}px;width:${h}px;height:${d}px;background:${sideL};transform-origin:100% 50%;transform:rotateY(90deg)"></i>`
+   +`<i style="top:${d-h}px;width:${w}px;height:${h}px;background:${o.frontBg||col};transform-origin:50% 100%;transform:rotateX(-90deg)">${fr}</i></div>`;
+}
+function figure(c){
+  const sk=c.skin, hr=c.hair, hs=c.hs;
+  const hairTop = hs==='grey' ? `radial-gradient(circle at 50% 50%, ${sk} 45%, ${hr} 46%)` : hr;
+  const sideCut = hs==='long'?72:(hs==='grey'?40:45);
+  const sideR=`linear-gradient(90deg, ${sk} ${100-sideCut}%, ${hr} ${100-sideCut}%)`, sideL=`linear-gradient(-90deg, ${sk} ${100-sideCut}%, ${hr} ${100-sideCut}%)`;
+  const face=`<div class="face" style="--hair:${hr}">${hs==='grey'?'':'<div class="fr"></div>'}<i class="ey l"></i><i class="ey r"></i>${c.glasses?'<i class="gl l"></i><i class="gl r"></i>':''}<i class="ck l"></i><i class="ck r"></i>${c.beard?'<i class="bd"></i>':''}<i class="mo"></i></div>`;
+  let extra='';
+  if(hs==='long') extra+=cube(36,8,30,4,hr,{y:-17});
+  if(hs==='bun') extra+=cube(14,14,12,30,hr,{y:-8});
+  if(c.helmet) extra+=cube(38,34,9,30,c.helmet)+cube(38,8,3,30,c.helmet,{y:19});
+  const torsoFront=`<div class="shirt"></div>${c.tie?`<div class="tie" style="--tie:${c.tie}"></div>`:''}`;
+  return ''
+   + cube(14,18,7,0,'#2B2B30',{x:-9,y:2}) + cube(14,18,7,0,'#2B2B30',{x:9,y:2})
+   + cube(14,14,40,6,c.pants,{x:-9}) + cube(14,14,40,6,c.pants,{x:9})
+   + cube(44,24,46,44,c.suit,{front:torsoFront})
+   + `<div class="jt arm l" style="--z:88px;left:-28px">${cube(11,14,40,-40,c.suit)}${cube(10,11,9,-49,sk)}</div>`
+   + `<div class="jt arm r" style="--z:88px;left:28px">${cube(11,14,40,-40,c.suit)}${cube(10,11,9,-49,sk)}</div>`
+   + cube(12,12,5,90,sk)
+   + `<div class="jt head" style="--z:94px">${cube(34,30,34,0,sk,{top:hairTop,back:hr,sideL,sideR,front:face})}${extra}</div>`;
+}
+function ang(dx,dy){ return Math.atan2(-dx,dy)*180/Math.PI; }
+function blendAng(a,b,t){ let d=((b-a+540)%360)-180; return a+d*t; }
+function faceAll(key,speaker){
+  const st=STATE[key], cast=SCENES[key][st.mode].cast, cam=-38;
+  const pos={}; cast.forEach(([id,p])=>pos[id]=posFor(p));
+  const cx=cast.reduce((s,[id])=>s+pos[id][0],0)/cast.length, cy=cast.reduce((s,[id])=>s+pos[id][1],0)/cast.length;
+  st.el.querySelectorAll('.world .pp').forEach(pp=>{
+    const id=pp.dataset.id, [x,y]=pos[id]; let a;
+    if(speaker && id===speaker) a=blendAng(cam, ang(cx-x,cy-y), .25);
+    else if(speaker && pos[speaker]) a=blendAng(cam, ang(pos[speaker][0]-x,pos[speaker][1]-y), .42);
+    else a=blendAng(cam, ang(cx-x,cy-y), .3);
+    pp.style.transform=`rotateZ(${a.toFixed(1)}deg)`;
+    pp.classList.toggle('talk',id===speaker);
+  });
+}
+const CAMS={};
+function buildOffice(key){
+  const s=STATE[key].el, office=s.querySelector('.office'), world=office.querySelector('.world'), T=THEMES[key];
+  world.innerHTML=`<div class="fl"></div><div class="wall wb">${wallItems(T.back)}</div><div class="wall wl">${wallItems(T.left)}</div>`
+    + T.boxes.map(boxHTML).join('')
+    + T.props.map(p=>(p.z?'':`<div class="shadow" style="left:${p.x}px;top:${p.y}px;width:44px;margin-left:-22px"></div>`)+`<div class="cut" data-z="${p.z||0}" style="left:${p.x-40}px;top:${p.y-90}px"><span class="${p.cls||''}" style="font-size:${p.s}px">${p.e}</span></div>`).join('')
+    + `<div class="people"></div>`;
+  let ov=office.querySelector('.ov'); if(!ov){ ov=document.createElement('div'); ov.className='ov'; office.appendChild(ov); }
+  ov.innerHTML=`<div class="ovpeople"></div>`;
+  const cam=CAMS[key]={cur:{rx:56,rz:38,z:.92,px:0,py:0},user:{rx:0,rz:0},focus:null,world,office,items:[]};
+  let drag=null;
+  office.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,rx:cam.user.rx,rz:cam.user.rz};office.classList.add('drag','touched');office.setPointerCapture(e.pointerId);});
+  office.addEventListener('pointermove',e=>{ if(!drag) return; cam.user.rz=Math.max(-55,Math.min(40,drag.rz+(e.clientX-drag.x)*.35)); cam.user.rx=Math.max(-24,Math.min(16,drag.rx-(e.clientY-drag.y)*.2)); });
+  const end=()=>{drag=null;office.classList.remove('drag');};
+  office.addEventListener('pointerup',end); office.addEventListener('pointercancel',end);
+  office.addEventListener('dblclick',()=>{cam.user.rx=0;cam.user.rz=0;});
+}
+function posFor(p){ const t=(p-50)/50; return [Math.round(250+t*150*0.79), Math.round(250-t*150*0.62)]; }
+
+function renderCast(key){
+  const st=STATE[key], sc=SCENES[key], people=st.el.querySelector('.people');
+  const cast=sc[st.mode].cast;
+  people.innerHTML=cast.map(([id,p])=>{ const [x,y]=posFor(p); return `<div class="shadow" style="left:${x}px;top:${y}px"></div><div class="pp" data-id="${id}" style="left:${x}px;top:${y}px">${figure(sc.chars[id])}</div>`+mk(x,y,136); }).join('');
+  st.el.querySelector('.ovpeople').innerHTML=cast.map(([id,p])=>{ const c=sc.chars[id];
+    return ovi(`<div class="fig" data-id="${id}"><div class="say"></div><div class="nm">${c.name}<small>${c.role}</small></div></div>`,`data-p="${p}"`); }).join('');
+  const cam=CAMS[key]; cam.focus=null;
+  const sticks=[...cam.world.querySelectorAll('.stick')], ovs=[...cam.office.querySelectorAll('.ov .ovi')];
+  cam.items=sticks.map((s,i)=>({s,o:ovs[i]}));
+  faceAll(key,null);
+}
+function setTalking(key,id){
+  STATE[key].el.querySelectorAll('.fig').forEach(f=>{ f.classList.toggle('talk',f.dataset.id===id); f.classList.toggle('dim',!!id&&f.dataset.id!==id); });
+  CAMS[key].focus=id||null;
+  faceAll(key,id||null);
+  if(!id) say(key,null);
+}
+function say(key,id,html){
+  STATE[key].el.querySelectorAll('.say').forEach(s=>s.classList.remove('on'));
+  if(!id) return;
+  const f=STATE[key].el.querySelector(`.fig[data-id="${id}"] .say`); if(!f) return;
+  f.innerHTML=html; void f.offsetWidth; f.classList.add('on');
+}
+const lerp=(a,b,k)=>a+(b-a)*k;
+function camLoop(t){
+  const s=slides[cur];
+  if(s && s.dataset.scene && CAMS[s.dataset.scene]){
+    const key=s.dataset.scene, cam=CAMS[key], c=cam.cur, office=cam.office;
+    const sc=(stage.getBoundingClientRect().width/1280)||1;
+    let focusEl=cam.focus?s.querySelector(`.fig[data-id="${cam.focus}"]`):null;
+    let tz=.92, trz=38;
+    if(focusEl){ const p=+focusEl.closest('.ovi').dataset.p; trz=38+(p-50)*.12; tz=1.08; }
+    c.rx=lerp(c.rx,56+cam.user.rx,.08); c.rz=lerp(c.rz,trz+cam.user.rz+Math.sin(t/2600)*2.2,.06); c.z=lerp(c.z,tz,.05);
+    if(focusEl){
+      const o=office.getBoundingClientRect(), r=focusEl.getBoundingClientRect();
+      const ex=(o.left+o.width*.5-(r.left+r.width/2))/sc, ey=(o.top+o.height*.56-(r.top+r.height*.5))/sc;
+      c.px=Math.max(-220,Math.min(220,c.px+ex*.06)); c.py=Math.max(-60,Math.min(170,c.py+ey*.06));
+    } else { c.px=lerp(c.px,0,.05); c.py=lerp(c.py,0,.05); }
+    cam.world.style.transform=`translate(-50%,-50%) translate(${c.px}px,${c.py}px) scale(${c.z}) rotateX(${c.rx}deg) rotateZ(${c.rz}deg)`;
+    const o=office.getBoundingClientRect(), sinx=Math.sin(c.rx*Math.PI/180)||1;
+    cam.world.querySelectorAll('.cut').forEach(el=>el.style.transform=`translateZ(${el.dataset.z}px) rotateZ(${-c.rz}deg) rotateX(-90deg)`);
+    cam.items.forEach(({s:st,o:ov})=>{
+      const r=st.getBoundingClientRect();
+      const x=(r.left+r.width/2-o.left)/sc, y=(r.bottom-o.top)/sc;
+      const k=Math.max(.75,Math.min(1.05,(r.height/sc)/(40*sinx)));
+      ov.style.transform=`translate(${x}px,${y}px) scale(${k})`;
+      ov.style.zIndex=Math.round(y)+(ov.querySelector('.fig.talk')?1000:0);
+    });
+  }
+  requestAnimationFrame(camLoop);
+}
+
+/* ================= DIALOGUES ================= */
+const STATE = {};
+document.querySelectorAll('[data-scene]').forEach(s=>{
+  const key=s.dataset.scene;
+  STATE[key]={mode:'good',idx:0,typing:null,played:{good:false,bad:false},el:s};
+  const box=s.querySelector('.chatbox');
+  box.innerHTML=`<div class="toggle"><button data-mode="good" class="on">＋ Плюси моделі</button><button data-mode="bad">− Мінуси моделі</button></div>
+    <div class="chat"></div>
+    <div class="foot"><span class="hint">Пробіл / → — наступна репліка</span><div class="btns"><span class="counter"></span><button class="nextb">Далі ▸</button></div></div>`;
+  box.querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>{ setMode(key,b.dataset.mode); b.blur(); });
+  box.querySelector('.foot .btns').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b) return; b.blur();
+    if(b.dataset.act==='bad') setMode(key,'bad');
+    else if(b.dataset.act==='next') go(cur+1);
+    else nextLine(key);
+  });
+  buildOffice(key);
+  setMode(key,'good',true);
+});
+requestAnimationFrame(camLoop);
+
+function setMode(key,mode,silent){
+  const st=STATE[key], s=st.el, box=s.querySelector('.chatbox');
+  if(st.typing){ clearTimeout(st.typing.timer); st.typing=null; }
+  st.mode=mode; st.idx=0;
+  box.classList.toggle('bad',mode==='bad'); box.classList.toggle('good',mode==='good');
+  box.querySelectorAll('.toggle button').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));
+  box.querySelector('.chat').innerHTML='';
+  renderCast(key);
+  updateFoot(key);
+  if(!silent) setTimeout(()=>nextLine(key),250);
+}
+
+
+function sideOf(key,id){
+  const row=SCENES[key][STATE[key].mode].cast.find(r=>r[0]===id);
+  return row?row[2]:'l';
+}
+
+function renderLine(key,line){
+  const chat=STATE[key].el.querySelector('.chat');
+  let el;
+  if(line.sys){ el=document.createElement('div'); el.className='sys'; el.textContent=line.sys; setTalking(key,null); }
+  else if(line.ins){ el=document.createElement('div'); el.className='insight '+line.ins; el.innerHTML=`<strong>${line.ins==='good'?'✅ ':'⚠️ '}${line.h}</strong>${line.t}`; setTalking(key,null); }
+  else{
+    const c=SCENES[key].chars[line.who];
+    el=document.createElement('div'); el.className='msg '+sideOf(key,line.who);
+    el.innerHTML=`<div class="av">${c.e}</div><div class="bub"><b>${c.name}</b>${line.t}${line.pop?`<button class="info" data-pop="${line.pop}">ⓘ Що це?</button>`:''}</div>`;
+    if(line.pop) setTimeout(()=>{ if(slides[cur]===STATE[key].el) showPop(line.pop); },1100);
+    setTalking(key,line.who); say(key,line.who,line.t);
+  }
+  chat.appendChild(el);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function nextLine(key){
+  const st=STATE[key], lines=SCENES[key][st.mode].lines;
+  if(st.typing){ clearTimeout(st.typing.timer); st.typing.el.remove(); const l=st.typing.line; st.typing=null; renderLine(key,l); updateFoot(key); return true; }
+  if(st.idx>=lines.length){
+    if(st.mode==='good' && !st.played.bad){ setMode(key,'bad'); return true; }
+    return false;
+  }
+  const line=lines[st.idx++];
+  if(line.who){
+    const chat=st.el.querySelector('.chat');
+    const c=SCENES[key].chars[line.who];
+    const t=document.createElement('div'); t.className='msg typing '+sideOf(key,line.who);
+    t.innerHTML=`<div class="av">${c.e}</div><div class="bub"><span></span><span></span><span></span></div>`;
+    chat.appendChild(t); chat.scrollTop=chat.scrollHeight;
+    setTalking(key,line.who); say(key,line.who,'<div class="dots"><span></span><span></span><span></span></div>');
+    st.typing={line,el:t,timer:setTimeout(()=>{ t.remove(); st.typing=null; renderLine(key,line); updateFoot(key); }, 550+Math.min(line.t.length*6,600))};
+  } else renderLine(key,line);
+  if(st.idx>=lines.length) st.played[st.mode]=true;
+  updateFoot(key);
+  return true;
+}
+
+function updateFoot(key){
+  const st=STATE[key], lines=SCENES[key][st.mode].lines, foot=st.el.querySelector('.foot');
+  const done=st.idx>=lines.length && !st.typing;
+  foot.querySelector('.counter').textContent=done?'':`${st.idx}/${lines.length}`;
+  const btns=foot.querySelector('.btns');
+  [...btns.querySelectorAll('button')].forEach(b=>b.remove());
+  if(!done){ const b=document.createElement('button'); b.textContent='Далі ▸'; btns.appendChild(b); foot.querySelector('.hint').textContent='Пробіл / → — наступна репліка'; }
+  else{
+    if(st.mode==='good' && !st.played.bad){ const b=document.createElement('button'); b.className='alt'; b.dataset.act='bad'; b.textContent='− А тепер мінуси моделі'; btns.appendChild(b); }
+    const n=document.createElement('button'); n.dataset.act='next'; n.textContent='Наступний слайд →'; btns.appendChild(n);
+    foot.querySelector('.hint').textContent='Сцену завершено';
+    setTalking(key,null);
+  }
+}
+
+/* ================= SLIDE WIDGETS ================= */
+document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>go(+b.dataset.jump)));
+document.querySelectorAll('.acard').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('open')));
+document.querySelectorAll('.pin').forEach(p=>p.addEventListener('click',e=>{
+  e.stopPropagation(); const was=p.classList.contains('on');
+  document.querySelectorAll('.pin').forEach(x=>x.classList.remove('on')); if(!was) p.classList.add('on'); p.blur();
+}));
+
+/* table */
+const ct=document.getElementById('ctable'), tsum=document.getElementById('tsum');
+const SUMS={1:"🇺🇸 США: працівник мобільніший, але менш захищений. Ставка — на індивідуальний результат і швидкість.",
+            2:"🇯🇵 Японія: працівник захищений, але прив’язаний до компанії. Ставка — на колектив і довгострокові відносини.",
+            3:"🇪🇺 Європа: працівник захищений законом, але система менш гнучка. Ставка — на баланс інтересів.",
+            4:"🇨🇳 Китай: працівник має ринковий контракт, але важать і довіра та зв’язки. Ставка — на поєднання ринку з традиціями."};
+const CCOL={1:"var(--usa-l)",2:"var(--jp-l)",3:"var(--eu-l)",4:"var(--cn-l)"};
+let tcol=0;
+ct.querySelectorAll('th[data-col]').forEach(th=>th.addEventListener('click',()=>{
+  const c=+th.dataset.col; tcol = (tcol===c)?0:c;
+  ct.classList.toggle('hl',!!tcol);
+  ct.querySelectorAll('tbody tr').forEach(tr=>[...tr.children].forEach((td,k)=>{
+    td.classList.toggle('on',k===tcol); td.style.setProperty('--cl',CCOL[k]||'#fff');
+  }));
+  ct.querySelectorAll('th[data-col]').forEach(h=>h.style.background=(+h.dataset.col===tcol)?CCOL[tcol]:'');
+  tsum.textContent = tcol?SUMS[tcol]:"США ставлять на індивідуальний результат, Японія — на довгострокові відносини й колектив, Європа — на баланс інтересів і правові гарантії, Китай — на поєднання ринку з традиціями.";
+}));
+ct.querySelectorAll('tbody td:first-child').forEach(td=>td.addEventListener('click',()=>{
+  const tr=td.parentElement, was=tr.classList.contains('rowon');
+  ct.querySelectorAll('tr').forEach(r=>r.classList.remove('rowon')); if(!was) tr.classList.add('rowon');
+}));
+
+/* efficiency */
+let currentEff='tenure';
+const chart=document.getElementById('chart'), take=document.getElementById('take');
+document.querySelectorAll('#effTabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#effTabs button').forEach(x=>x.classList.toggle('on',x===b)); b.blur();
+  currentEff=b.dataset.k; showEff(currentEff);
+}));
+function showEff(k){
+  const d=EFF[k];
+  take.innerHTML=`<strong>Висновок</strong>${d.take}`;
+  if(d.fin){
+    chart.innerHTML=`<h4>Фінансова віддача від HR-практик</h4>
+      <div style="display:flex;gap:26px;align-items:center;margin-top:10px">
+        <div style="font-size:90px">📈</div>
+        <div><div class="bignum">+$15 000</div><div class="lead">ринкової вартості компанії <b>на одного працівника</b><br>при зростанні індексу HR-практик на одне стандартне відхилення</div></div>
+      </div>
+      <div class="lead" style="margin-top:22px;font-size:16px">Ще раніше Хьюселід на ~1000 фірм показав: розвинені HR-системи → <b>нижча плинність</b>, <b>вища продуктивність</b>, <b>кращі фінанси</b>.</div>
+      <div class="src">Джерело: ${d.src}</div>`;
+    return;
+  }
+  chart.innerHTML=`<h4>${d.h}</h4>`+d.rows.map(r=>`<div class="brow"><div class="l">${r.l}</div><div class="btrack"><div class="bfill" style="--c:${r.c};background:${r.c}" data-w="${r.v/d.max*100}">${r.lab}</div></div></div>`).join('')+`<div class="src">Джерело: ${d.src}</div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>chart.querySelectorAll('.bfill').forEach(f=>f.style.width=f.dataset.w+'%')));
+}
+
+/* venn */
+const venn=document.getElementById('venn');
+document.getElementById('vennBtn').addEventListener('click',e=>{
+  venn.classList.toggle('near'); const on=venn.classList.contains('near');
+  e.target.textContent=on?'↺ Повернути':'▶ Показати зближення'; e.target.blur();
+  document.getElementById('vcap').textContent=on?'Кола зблизилися й перетнулися (спільні тренди), але не злилися в одне — кожна модель зберегла себе.':'Натисніть кнопку: моделі зближуються…';
+});
+
+/* builder */
+const pool=document.getElementById('pool'), basket=document.getElementById('basket'), verdict=document.getElementById('verdict');
+const chosen=new Set();
+POOL.forEach(p=>{
+  const b=document.createElement('button'); b.textContent=p.t; b.style.setProperty('--c',MC[p.m]); if(p.m==='anti') b.classList.add('anti');
+  b.onclick=()=>{
+    b.blur();
+    if(p.m==='anti'){ b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); verdict.innerHTML=`<span style="color:var(--bad)">🙅 Це недолік: ${p.why.toLowerCase()}. Не переносимо.</span>`; return; }
+    chosen.has(p.t)?chosen.delete(p.t):chosen.add(p.t); drawBasket();
+  };
+  p.el=b; pool.appendChild(b);
+});
+function drawBasket(){
+  POOL.forEach(p=>p.el.classList.toggle('sel',chosen.has(p.t)));
+  const items=POOL.filter(p=>chosen.has(p.t));
+  basket.innerHTML = items.length?items.map(p=>`<span style="--c:${MC[p.m]};background:${MC[p.m]}">${p.t}</span>`).join(''):'<span class="empty">Тут з’явиться ваша модель 👇</span>';
+  const ms=new Set(items.map(p=>p.m));
+  if(!items.length) verdict.textContent='';
+  else if(ms.size===1) verdict.innerHTML='🤔 Лише одна модель — це копіювання, а не адаптація. Додайте інші.';
+  else if(ms.size>=3) verdict.innerHTML='<span style="color:var(--good)">✅ Збалансоване поєднання сильних сторін — це і є адаптація.</span>';
+  else verdict.innerHTML='👍 Непогано! Спробуйте додати ще одну модель.';
+}
+document.getElementById('recBtn').onclick=e=>{ e.target.blur(); chosen.clear(); let i=0; const t=setInterval(()=>{ chosen.add(REC[i++]); drawBasket(); if(i>=REC.length) clearInterval(t); },220); };
+document.getElementById('clrBtn').onclick=e=>{ e.target.blur(); chosen.clear(); drawBasket(); };
+
+/* builder overlay */
+const bldBg=document.getElementById('bldBg');
+const bldOpen=()=>bldBg.classList.contains('show');
+document.getElementById('bldBtn').onclick=e=>{ e.currentTarget.blur(); bldBg.classList.add('show'); };
+document.getElementById('bldClose').onclick=()=>bldBg.classList.remove('show');
+bldBg.addEventListener('click',e=>{ if(e.target===bldBg) bldBg.classList.remove('show'); });
+
+/* notes */
+const notesEl=document.getElementById('notes'), notesBtn=document.getElementById('notesBtn');
+function renderNotes(){ notesEl.innerHTML='<b>Текст доповіді · слайд '+(cur+1)+'</b>'+(NOTES[cur]||[]).map(p=>`<p>${p}</p>`).join(''); notesEl.scrollTop=0; }
+function toggleNotes(){ notesEl.classList.toggle('show'); notesBtn.classList.toggle('on',notesEl.classList.contains('show')); }
+notesBtn.onclick=e=>{ e.currentTarget.blur(); toggleNotes(); };
+
+/* fullscreen */
+function fs(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+document.getElementById('fsBtn').onclick=e=>{ e.currentTarget.blur(); fs(); };
+document.getElementById('prevBtn').onclick=e=>{ e.currentTarget.blur(); go(cur-1); };
+document.getElementById('nextBtn').onclick=e=>{ e.currentTarget.blur(); advance(); };
+
+/* confetti */
+function confetti(){
+  const cols=['#2F6FED','#E0474C','#159A86','#E3962A','#7C5CFF'];
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*1280+'px'; c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(1.8+Math.random()*1.8)+'s'; c.style.animationDelay=(Math.random()*.6)+'s';
+    stage.appendChild(c); setTimeout(()=>c.remove(),4200);
+  }
+}
+
+/* keyboard */
+addEventListener('keydown',e=>{
+  if(e.target.isContentEditable) return;
+  const k=e.key.toLowerCase();
+  if(k==='escape'){ closePop(); bldBg.classList.remove('show'); return; }
+  if(popOpen() && ['arrowleft','pageup'].includes(k)){ e.preventDefault(); closePop(); return; }
+  if(['arrowright','pagedown',' '].includes(k)){ e.preventDefault(); advance(); }
+  else if(['arrowleft','pageup'].includes(k)){ e.preventDefault(); go(cur-1); }
+  else if(k==='home'){ go(0); } else if(k==='end'){ go(slides.length-1); }
+  else if(k==='n'||k==='т'){ toggleNotes(); }
+  else if(k==='f'||k==='а'){ fs(); }
+  else if(k==='t'||k==='е'){ const s=slides[cur]; if(s.dataset.scene){ const st=STATE[s.dataset.scene]; setMode(s.dataset.scene, st.mode==='good'?'bad':'good'); } }
+});
+
+go(0);
+</script>
+</body>
+</html>
